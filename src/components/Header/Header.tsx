@@ -1,6 +1,6 @@
 import React from 'react';
-import Search from '../Search/Search';
 import s from './Header.module.scss';
+import Search from '../Search/Search';
 
 interface HeaderProps {
   onSearch: (term: string) => void;
@@ -15,7 +15,7 @@ class Header extends React.Component<HeaderProps> {
           Use the field below to find the cat breed you are interested in.
         </p>
         <p className={s.subtitle}>
-          For example: Main Coon, Bengal, Sphynx, Norwegian, Persian,Ocicat,etc.
+          For example: Maine, Bengal, Sphynx, Norwegian, Persian,Ocicat,etc.
         </p>
         <Search onSearch={this.props.onSearch} />
       </header>
