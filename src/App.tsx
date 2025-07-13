@@ -1,7 +1,13 @@
 import React from 'react';
+import MainBlock from './components/MainBlock/MainBlock';
+import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
 
 const App: React.FC = () => {
-  return <h1>Cats</h1>;
+  return (
+    <ErrorBoundary>
+      <MainBlock />
+    </ErrorBoundary>
+  );
 };
 
 export default App;
