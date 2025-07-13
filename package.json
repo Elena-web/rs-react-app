@@ -12,7 +12,9 @@
     "preview": "vite preview",
     "prepare": "husky",
     "format:fix": "prettier --write .",
-	"test": "eslint ."
+	"test": "eslint .",
+	"predeploy": "npm run build",
+    "deploy": "class-components -d dist"
   },
   "dependencies": {
     "react": "^19.1.0",
