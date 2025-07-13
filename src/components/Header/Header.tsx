@@ -1,4 +1,5 @@
 import React from 'react';
+import Search from '../Search/Search';
 import s from './Header.module.scss';
 
 interface HeaderProps {
@@ -16,6 +17,7 @@ class Header extends React.Component<HeaderProps> {
         <p className={s.subtitle}>
           For example: Main Coon, Bengal, Sphynx, Norwegian, Persian,Ocicat,etc.
         </p>
+        <Search onSearch={this.props.onSearch} />
       </header>
     );
   }
