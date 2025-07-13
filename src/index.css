@@ -1,5 +1,5 @@
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Roboto", sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
@@ -28,6 +28,11 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  font-family: "Roboto", sans-serif;
+}
+
+button {
+	border: none;
 }
 
 h1 {
@@ -66,3 +71,5 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+
