@@ -5,7 +5,7 @@ import { NodePackageImporter } from 'sass-embedded';
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: '/rs-react-app/',
+  base: 'rs-react-app',
   css: {
     preprocessorOptions: {
       scss: {

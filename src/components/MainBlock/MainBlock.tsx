@@ -16,6 +16,7 @@ interface MainState {
   query: string;
   page: number;
   limit: number;
+  fatalError: boolean;
 }
 
 interface BreedResponse {
@@ -40,6 +41,7 @@ class MainBlock extends React.Component<unknown, MainState> {
       query: localStorage.getItem('searchTerm') || '',
       page: 1,
       limit: 10,
+      fatalError: false,
     };
   }
 
@@ -117,7 +119,9 @@ class MainBlock extends React.Component<unknown, MainState> {
 
   render() {
     const { items, loading, error, page } = this.state;
-
+    if (this.state.fatalError) {
+      throw new Error('Simulated error caught by ErrorBoundary');
+    }
     return (
       <main className={s.main}>
         <Header onSearch={this.handleSearch} />
@@ -148,7 +152,7 @@ class MainBlock extends React.Component<unknown, MainState> {
         <div className={s.errorButton}>
           <button
             onClick={() => {
-              throw new Error('Error');
+              this.setState({ fatalError: true });
             }}
             className={s.throwButton}
           >
