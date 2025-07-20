@@ -10,13 +10,16 @@ export interface ImageResponseItem {
   breeds: BreedResponse[];
 }
 
-const API_KEY = 'live_HWgjjjcVbpz6zUvU4914UAN3W1P2RcEC32VWQ15aK0fjB71qqSUc7O4D5IccTj0b';
+const API_KEY =
+  'live_HWgjjjcVbpz6zUvU4914UAN3W1P2RcEC32VWQ15aK0fjB71qqSUc7O4D5IccTj0b';
 
 const headers = {
   'x-api-key': API_KEY,
 };
 
-export async function fetchBreedsByQuery(query: string): Promise<BreedResponse[]> {
+export async function fetchBreedsByQuery(
+  query: string
+): Promise<BreedResponse[]> {
   if (!query.trim()) return [];
 
   const response = await fetch(

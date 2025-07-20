@@ -1,10 +1,12 @@
+import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { describe, test, expect, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import Header from './Header';
 
-vi.mock('../Search/Search', () => ({
+// Мокируем Search с помощью jest.mock
+jest.mock('../Search/Search', () => ({
+  __esModule: true, // чтобы корректно работал импорт по умолчанию
   default: ({ onSearch }: { onSearch: (term: string) => void }) => (
     <button onClick={() => onSearch('Maine Coon')}>Mock Search</button>
   ),
@@ -12,7 +14,7 @@ vi.mock('../Search/Search', () => ({
 
 describe('Header Component', () => {
   test('renders title and subtitles', () => {
-    const mockOnSearch = vi.fn();
+    const mockOnSearch = jest.fn();
     render(<Header onSearch={mockOnSearch} />);
 
     expect(
@@ -26,7 +28,7 @@ describe('Header Component', () => {
   });
 
   test('calls onSearch when Search component triggers it', async () => {
-    const mockOnSearch = vi.fn();
+    const mockOnSearch = jest.fn();
     render(<Header onSearch={mockOnSearch} />);
 
     const button = screen.getByText('Mock Search');

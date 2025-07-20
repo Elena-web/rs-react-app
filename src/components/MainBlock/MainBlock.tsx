@@ -3,7 +3,7 @@ import CardList from '../CardList/CardList';
 import Header from '../Header/Header';
 import s from './MainBlock.module.scss';
 
-import { fetchBreedsByQuery, fetchCatImages } from '../../api/CatApi';
+import { fetchBreedsByQuery, fetchCatImages } from '../../api/catApi';
 
 interface CatCard {
   id: string;
