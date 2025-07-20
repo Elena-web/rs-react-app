@@ -3,6 +3,8 @@ import CardList from '../CardList/CardList';
 import Header from '../Header/Header';
 import s from './MainBlock.module.scss';
 
+import { fetchBreedsByQuery, fetchCatImages } from '../../api/CatApi';
+
 interface CatCard {
   id: string;
   imageUrl: string;
@@ -19,20 +21,8 @@ interface MainState {
   fatalError: boolean;
 }
 
-interface BreedResponse {
-  id: string;
-  name: string;
-  description?: string;
-}
-
-interface ImageResponseItem {
-  id: string;
-  url: string;
-  breeds: BreedResponse[];
-}
-
-class MainBlock extends React.Component<unknown, MainState> {
-  constructor(props: unknown) {
+class MainBlock extends React.Component<{}, MainState> {
+  constructor(props: {}) {
     super(props);
     this.state = {
       items: [],
@@ -60,31 +50,11 @@ class MainBlock extends React.Component<unknown, MainState> {
       let breedIds: string[] = [];
 
       if (trimmed) {
-        const breedRes = await fetch(
-          `https://api.thecatapi.com/v1/breeds/search?q=${encodeURIComponent(trimmed)}`,
-          {
-            headers: {
-              'x-api-key':
-                'live_HWgjjjcVbpz6zUvU4914UAN3W1P2RcEC32VWQ15aK0fjB71qqSUc7O4D5IccTj0b',
-            },
-          }
-        );
-        const breedData: BreedResponse[] = await breedRes.json();
+        const breedData = await fetchBreedsByQuery(trimmed);
         breedIds = breedData.map((breed) => breed.id);
       }
 
-      const imageUrl = `https://api.thecatapi.com/v1/images/search?limit=${limit}&page=${page}${
-        breedIds.length ? `&breed_ids=${breedIds.join(',')}` : ''
-      }`;
-
-      const imageRes = await fetch(imageUrl, {
-        headers: {
-          'x-api-key':
-            'live_HWgjjjcVbpz6zUvU4914UAN3W1P2RcEC32VWQ15aK0fjB71qqSUc7O4D5IccTj0b',
-        },
-      });
-
-      const imageData: ImageResponseItem[] = await imageRes.json();
+      const imageData = await fetchCatImages(limit, page, breedIds);
 
       const formatted: CatCard[] = imageData.map((item) => ({
         id: item.id,
