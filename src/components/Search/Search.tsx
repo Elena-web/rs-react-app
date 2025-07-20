@@ -38,7 +38,7 @@ class Search extends Component<SearchProps, SearchState> {
           placeholder="Siberian"
         />
         <button onClick={this.handleSearch} className={s.button}>
-          Поиск
+          Search
         </button>
       </div>
     );
