@@ -9,13 +9,18 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "prepare": "husky",
+    "prepare": "husky install",
     "format:fix": "prettier --write .",
     "test:lint": "eslint .",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist",
     "test": "jest",
     "test:coverage": "jest --coverage"
+  },
+  "husky": {
+    "hooks": {
+      "pre-push": "npm test"
+    }
   },
   "dependencies": {
     "react": "^19.1.0",
@@ -40,7 +45,7 @@
     "eslint-plugin-react-refresh": "^0.4.20",
     "gh-pages": "^6.3.0",
     "globals": "^16.3.0",
-    "husky": "^9.1.7",
+    "husky": "^8.0.0",
     "jest": "^30.0.4",
     "jest-environment-jsdom": "^30.0.4",
     "jsdom": "^26.1.0",
