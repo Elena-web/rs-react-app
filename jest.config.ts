@@ -3,7 +3,6 @@ import type { Config } from 'jest';
 const config: Config = {
   preset: 'ts-jest',
   testEnvironment: 'jsdom',
-  //setupFilesAfterEnv: ['./jest.setup.ts'], // обязательно создай файл с импортом jest-dom
   testMatch: ['**/*.test.tsx', '**/*.spec.tsx'],
   moduleNameMapper: {
     '\\.(css|scss|sass)$': '<rootDir>/__mocks__/styleMock.js',

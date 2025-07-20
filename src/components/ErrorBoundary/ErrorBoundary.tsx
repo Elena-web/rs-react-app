@@ -4,6 +4,7 @@ import s from './ErrorBoundary.module.scss';
 
 interface ErrorBoundaryProps {
   children: ReactNode;
+  reloadFn?: () => void;
 }
 
 interface ErrorBoundaryState {
@@ -26,6 +27,8 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   }
 
   render() {
+    const { reloadFn } = this.props;
+
     if (this.state.hasError) {
       return (
         <div className={s.errorBoundary}>
@@ -35,7 +38,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
             {this.state.error?.message}
           </details>
           <button
-            onClick={() => window.location.reload()}
+            onClick={() => (reloadFn ? reloadFn() : window.location.reload())}
             className={s.reloadButton}
           >
             Try again

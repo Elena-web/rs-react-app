@@ -4,9 +4,8 @@ import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import Header from './Header';
 
-// Мокируем Search с помощью jest.mock
 jest.mock('../Search/Search', () => ({
-  __esModule: true, // чтобы корректно работал импорт по умолчанию
+  __esModule: true, 
   default: ({ onSearch }: { onSearch: (term: string) => void }) => (
     <button onClick={() => onSearch('Maine Coon')}>Mock Search</button>
   ),
