@@ -3,5 +3,18 @@
   "references": [
     { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.node.json" }
-  ]
+  ],
+  "compilerOptions": {
+	"moduleResolution": "node",    
+    "composite": true,
+	"noEmit": false,
+    "esModuleInterop": true,
+    "jsx": "react",
+    "module": "esnext",
+    "target": "es6",
+    "strict": true,
+	"types": ["vite/client", "vitest/globals", "react", "react-dom"]
+  },
+  "include": ["src/**/*", "types/scss.d.ts", "types/vite-env.d.ts", "vitest.config.ts"], 
+  "exclude": ["node_modules"],
 }
