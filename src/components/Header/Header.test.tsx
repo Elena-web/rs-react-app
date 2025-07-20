@@ -16,7 +16,7 @@ describe('Header Component', () => {
     render(<Header onSearch={mockOnSearch} />);
 
     expect(
-      screen.getByText(/Discover Your Purrfect Breed/i)
+      screen.getByText(/Discover Your Perfect Breed/i)
     ).toBeInTheDocument();
     expect(
       screen.getByText(/Use the field below to find the cat breed/i)
