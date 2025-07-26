@@ -32,4 +32,20 @@ describe('Card component', () => {
     const img = screen.getByRole('img');
     expect(img).toHaveAttribute('src', 'https://placekitten.com/300/200');
   });
+
+  it('renders fallback image when imageUrl is null', () => {
+    const title = 'Null URL Cat';
+    render(<Card title={title} imageUrl={null} />);
+
+    const img = screen.getByRole('img');
+    expect(img).toHaveAttribute('src', 'https://placekitten.com/300/200');
+  });
+
+  it('renders fallback image when imageUrl is undefined', () => {
+    const title = 'Undefined URL Cat';
+    render(<Card title={title} imageUrl={undefined} />);
+
+    const img = screen.getByRole('img');
+    expect(img).toHaveAttribute('src', 'https://placekitten.com/300/200');
+  });
 });

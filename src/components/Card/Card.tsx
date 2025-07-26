@@ -3,7 +3,7 @@ import s from './Card.module.scss';
 
 interface CardProps {
   title: string;
-  imageUrl?: string;
+  imageUrl?: string | null;
 }
 
 class Card extends React.Component<CardProps> {
