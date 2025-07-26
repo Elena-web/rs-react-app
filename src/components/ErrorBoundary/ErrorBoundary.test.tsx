@@ -1,7 +1,8 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import ErrorBoundary from './ErrorBoundary';
+import userEvent from '@testing-library/user-event';
 
 describe('ErrorBoundary', () => {
   it('renders children when no error is thrown', () => {
@@ -49,7 +50,7 @@ describe('ErrorBoundary', () => {
     );
 
     const button = screen.getByRole('button', { name: /try again/i });
-    fireEvent.click(button);
+    userEvent.click(button);
 
     expect(mockReload).toHaveBeenCalled();
 

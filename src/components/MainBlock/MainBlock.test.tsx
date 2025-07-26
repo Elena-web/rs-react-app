@@ -1,8 +1,9 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import MainBlock from './MainBlock';
 import { mockBreedResponse, mockImageResponse } from './__mocks__/mocks';
+import userEvent from '@testing-library/user-event';
 
 import { fetchBreedsByQuery, fetchCatImages } from '../../api/catApi';
 
@@ -23,11 +24,15 @@ describe('MainBlock component', () => {
 
     render(<MainBlock />);
 
-    expect(screen.queryByText(mockBreedResponse[0].name)).not.toBeInTheDocument();
-   
+    expect(
+      screen.queryByText(mockBreedResponse[0].name)
+    ).not.toBeInTheDocument();
+
     await waitFor(() => {
-      expect(screen.getByText(mockBreedResponse[0].name)).toBeInTheDocument();      
-      if (mockImageResponse.some(img => !img.breeds || img.breeds.length === 0)) {
+      expect(screen.getByText(mockBreedResponse[0].name)).toBeInTheDocument();
+      if (
+        mockImageResponse.some((img) => !img.breeds || img.breeds.length === 0)
+      ) {
         expect(screen.getByText('Funny cat')).toBeInTheDocument();
       }
     });
@@ -52,7 +57,7 @@ describe('MainBlock component', () => {
     render(<MainBlock />);
 
     const nextButton = screen.getByRole('button', { name: /next/i });
-    fireEvent.click(nextButton);
+    userEvent.click(nextButton);
 
     await waitFor(() => {
       expect(fetchCatImages).toHaveBeenCalledWith(
@@ -63,7 +68,7 @@ describe('MainBlock component', () => {
     });
 
     const prevButton = screen.getByRole('button', { name: /previous/i });
-    fireEvent.click(prevButton);
+    userEvent.click(prevButton);
 
     await waitFor(() => {
       expect(fetchCatImages).toHaveBeenCalledWith(
@@ -79,13 +84,15 @@ describe('MainBlock component', () => {
       { children: React.ReactNode },
       { hasError: boolean }
     > {
-      constructor(props: any) {
+      constructor(props: { children: React.ReactNode }) {
         super(props);
         this.state = { hasError: false };
       }
+
       static getDerivedStateFromError() {
         return { hasError: true };
       }
+
       render() {
         if (this.state.hasError) {
           return <div data-testid="error-boundary">Error caught!</div>;
@@ -101,7 +108,7 @@ describe('MainBlock component', () => {
     );
 
     const errorButton = screen.getByRole('button', { name: /trigger error/i });
-    fireEvent.click(errorButton);
+    userEvent.click(errorButton);
 
     expect(screen.getByTestId('error-boundary')).toBeInTheDocument();
   });

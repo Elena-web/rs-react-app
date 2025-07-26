@@ -96,7 +96,11 @@ class MainBlock extends React.Component<{}, MainState> {
       <main className={s.main}>
         <Header onSearch={this.handleSearch} />
 
-        {error && <div className={s.error} role="alert">{error}</div>}
+        {error && (
+          <div className={s.error} role="alert">
+            {error}
+          </div>
+        )}
 
         <section className={s.results}>
           <CardList items={items} loading={loading} />
