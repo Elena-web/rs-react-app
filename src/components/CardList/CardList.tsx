@@ -15,13 +15,13 @@ class CardList extends React.Component<CardListProps> {
   render() {
     if (this.props.loading) {
       return (
-        <div className={s.wrapper}>          
-            <CardSkeleton />
-            <CardSkeleton />
-			<CardSkeleton />
-            <CardSkeleton />
-			<CardSkeleton />
-            <CardSkeleton />
+        <div className={s.wrapper}>
+          <CardSkeleton />
+          <CardSkeleton />
+          <CardSkeleton />
+          <CardSkeleton />
+          <CardSkeleton />
+          <CardSkeleton />
         </div>
       );
     }
