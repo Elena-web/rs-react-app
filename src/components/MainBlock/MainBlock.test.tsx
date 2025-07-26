@@ -1,11 +1,10 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import MainBlock from './MainBlock';
-import { mockBreedResponse, mockImageResponse } from './__mocks__/mocks';
 import userEvent from '@testing-library/user-event';
-
+import MainBlock from './MainBlock';
 import { fetchBreedsByQuery, fetchCatImages } from '../../api/catApi';
+import { mockBreedResponse, mockImageResponse } from './__mocks__/mocks';
 
 jest.mock('../../api/catApi', () => ({
   fetchBreedsByQuery: jest.fn(),
@@ -30,15 +29,31 @@ describe('MainBlock component', () => {
 
     await waitFor(() => {
       expect(screen.getByText(mockBreedResponse[0].name)).toBeInTheDocument();
-      if (
-        mockImageResponse.some((img) => !img.breeds || img.breeds.length === 0)
-      ) {
-        expect(screen.getByText('Funny cat')).toBeInTheDocument();
-      }
+    });
+  });
+
+  it('renders "Funny cat" when images have no breeds', async () => {
+    const mockImageResponseWithNoBreeds = [
+      { id: '1', url: 'image1.jpg', breeds: [] },
+      { id: '2', url: 'image2.jpg', breeds: [] },
+    ];
+
+    (fetchBreedsByQuery as jest.Mock).mockResolvedValue(mockBreedResponse);
+    (fetchCatImages as jest.Mock).mockResolvedValue(
+      mockImageResponseWithNoBreeds
+    );
+
+    render(<MainBlock />);
+
+    await waitFor(() => {
+      const funnyCats = screen.getAllByText('Funny cat');
+      expect(funnyCats.length).toBeGreaterThan(0);
     });
   });
 
   it('displays error alert on API failure', async () => {
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+
     (fetchBreedsByQuery as jest.Mock).mockRejectedValue(new Error('API error'));
     (fetchCatImages as jest.Mock).mockRejectedValue(new Error('API error'));
 
@@ -50,36 +65,54 @@ describe('MainBlock component', () => {
     });
   });
 
-  it('handles pagination buttons', async () => {
+  it('increments page when clicking Next button', async () => {
     (fetchBreedsByQuery as jest.Mock).mockResolvedValue(mockBreedResponse);
     (fetchCatImages as jest.Mock).mockResolvedValue(mockImageResponse);
 
     render(<MainBlock />);
 
     const nextButton = screen.getByRole('button', { name: /next/i });
-    userEvent.click(nextButton);
+    await userEvent.click(nextButton);
 
     await waitFor(() => {
       expect(fetchCatImages).toHaveBeenCalledWith(
         expect.any(Number),
-        2, // страница увеличена
-        expect.any(Array)
-      );
-    });
-
-    const prevButton = screen.getByRole('button', { name: /previous/i });
-    userEvent.click(prevButton);
-
-    await waitFor(() => {
-      expect(fetchCatImages).toHaveBeenCalledWith(
-        expect.any(Number),
-        1, // страница минимальна
+        2,
         expect.any(Array)
       );
     });
   });
 
-  it('throws and catches fatalError in ErrorBoundary', async () => {
+  it('decrements page when clicking Previous button', async () => {
+    (fetchBreedsByQuery as jest.Mock).mockResolvedValue(mockBreedResponse);
+    (fetchCatImages as jest.Mock).mockResolvedValue(mockImageResponse);
+
+    render(<MainBlock />);
+
+    const nextButton = screen.getByRole('button', { name: /next/i });
+    await userEvent.click(nextButton);
+
+    await waitFor(() => {
+      expect(fetchCatImages).toHaveBeenCalledWith(
+        expect.any(Number),
+        2,
+        expect.any(Array)
+      );
+    });
+
+    const prevButton = screen.getByRole('button', { name: /previous/i });
+    await userEvent.click(prevButton);
+
+    await waitFor(() => {
+      expect(fetchCatImages).toHaveBeenCalledWith(
+        expect.any(Number),
+        1,
+        expect.any(Array)
+      );
+    });
+  });
+
+  it('catches fatal error in ErrorBoundary and shows fallback UI', async () => {
     class TestErrorBoundary extends React.Component<
       { children: React.ReactNode },
       { hasError: boolean }
@@ -108,8 +141,10 @@ describe('MainBlock component', () => {
     );
 
     const errorButton = screen.getByRole('button', { name: /trigger error/i });
-    userEvent.click(errorButton);
+    await userEvent.click(errorButton);
 
-    expect(screen.getByTestId('error-boundary')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByTestId('error-boundary')).toBeInTheDocument();
+    });
   });
 });

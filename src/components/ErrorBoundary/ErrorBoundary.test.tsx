@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import ErrorBoundary from './ErrorBoundary';
 import userEvent from '@testing-library/user-event';
+import ErrorBoundary from './ErrorBoundary';
 
 describe('ErrorBoundary', () => {
   it('renders children when no error is thrown', () => {
@@ -34,7 +34,7 @@ describe('ErrorBoundary', () => {
     errorSpy.mockRestore();
   });
 
-  it('reloads the page when clicking "Try again"', () => {
+  it('reloads the page when clicking "Try again"', async () => {
     const mockReload = jest.fn();
 
     const ProblemChild = () => {
@@ -49,8 +49,8 @@ describe('ErrorBoundary', () => {
       </ErrorBoundary>
     );
 
-    const button = screen.getByRole('button', { name: /try again/i });
-    userEvent.click(button);
+    const button = await screen.findByRole('button', { name: /try again/i });
+    await userEvent.click(button);
 
     expect(mockReload).toHaveBeenCalled();
 

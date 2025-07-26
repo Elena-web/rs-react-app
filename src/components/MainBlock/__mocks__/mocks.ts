@@ -16,4 +16,3 @@ export const mockBreedResponse = [
       'The Abyssinian is easy to care for, and a joy to have in your home. They’re affectionate cats and love both people and other animals.',
   },
 ];
-
