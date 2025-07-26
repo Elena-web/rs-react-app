@@ -15,7 +15,7 @@ class CardList extends React.Component<CardListProps> {
   render() {
     if (this.props.loading) {
       return (
-        <div className={s.wrapper}>
+        <div className={s.wrapper} data-testid="loader">
           <CardSkeleton />
           <CardSkeleton />
           <CardSkeleton />

@@ -147,4 +147,18 @@ describe('MainBlock component', () => {
       expect(screen.getByTestId('error-boundary')).toBeInTheDocument();
     });
   });
+
+  it('renders cat cards after loading', async () => {
+    (fetchBreedsByQuery as jest.Mock).mockResolvedValue(mockBreedResponse);
+    (fetchCatImages as jest.Mock).mockResolvedValue(mockImageResponse);
+
+    render(<MainBlock />);
+
+    expect(screen.getByTestId('loader')).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(screen.queryByTestId('loader')).not.toBeInTheDocument();
+      expect(screen.getByText(mockBreedResponse[0].name)).toBeInTheDocument();
+    });
+  });
 });
