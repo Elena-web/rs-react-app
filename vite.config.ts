@@ -1,14 +1,19 @@
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
-import { NodePackageImporter } from 'sass-embedded';
+import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
   base: 'rs-react-app',
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, 'src'),
+    },
+  },
   css: {
     preprocessorOptions: {
       scss: {
-        importers: [new NodePackageImporter()],
+        additionalData: `@import "@/styles/constants.scss";`,
       },
     },
   },

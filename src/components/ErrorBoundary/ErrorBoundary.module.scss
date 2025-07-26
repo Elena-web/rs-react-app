@@ -1,9 +1,9 @@
 .errorBoundary {
   padding: 2rem;
-  background-color: #ffebee; // светло-красный фон
-  border: 2px solid #ef5350; // яркий цвет ошибки
+  background-color: $color-error-bg;
+  border: 2px solid $color-error-border;
   border-radius: 8px;
-  color: #c62828; // тёмно-красный текст
+  color: $color-error-text;
   max-width: 600px;
   margin: 2rem auto;
   text-align: center;
@@ -12,7 +12,7 @@
 .errorBoundary h2 {
   margin-top: 0;
   font-size: 1.5rem;
-  color: #b71c1c;
+  color: $color-error-heading;
 }
 
 .errorBoundary details {
@@ -20,8 +20,8 @@
   margin: 1rem auto;
   max-width: 90%;
   white-space: pre-wrap;
-  color: #e53935;
-  background-color: #ffcdd2;
+  color: $color-error-details-text;
+  background-color: $color-error-details-bg;
   padding: 1rem;
   border-radius: 4px;
   font-size: 0.9rem;
@@ -31,7 +31,7 @@
   margin-top: 1rem;
   padding: 0.5rem 1rem;
   font-size: 1rem;
-  background-color: #ef5350;
+  background-color: $color-error-border;
   color: white;
   border: none;
   border-radius: 4px;
@@ -39,6 +39,6 @@
   transition: background-color 0.3s ease;
 
   &:hover {
-    background-color: #e53935;
+    background-color: $color-error-hover;
   }
 }

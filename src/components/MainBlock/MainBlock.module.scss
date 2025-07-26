@@ -10,13 +10,13 @@
 .loading {
   text-align: center;
   font-size: 1.1rem;
-  color: #2563eb;
+  color: $color-info;
 }
 
 .error {
   text-align: center;
   font-size: 1.1rem;
-  color: #dc2626;
+  color: $color-danger;
 }
 
 .results {
@@ -33,38 +33,33 @@
 .pageButton {
   padding: 0.75rem 1.5rem;
   font-size: 1rem;
-  background-color: #d1d5db;
+  background-color: $color-pagination-bg;
   border-radius: 8px;
   transition: background-color 0.2s ease;
   cursor: pointer;
 
   &:hover {
-    background-color: #9ca3af;
+    background-color: $color-pagination-hover;
   }
 
   &:disabled {
-    background-color: #e5e7eb;
+    background-color: $color-pagination-disabled;
     cursor: not-allowed;
   }
 }
 
 .pageNext {
-  background-color: #3b82f6;
-  color: white;
+  background-color: $color-pagination-active;
+  color: $color-white;
 
   &:hover {
-    background-color: #2563eb;
+    background-color: $color-info;
   }
 }
 
-.errorButton {
-  display: flex;
-  justify-content: center;
-}
-
 .throwButton {
-  background-color: #ef4444;
-  color: white;
+  background-color: $color-throw-bg;
+  color: $color-white;
   font-size: 1rem;
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
@@ -72,6 +67,6 @@
   transition: background-color 0.2s ease;
 
   &:hover {
-    background-color: #dc2626;
+    background-color: $color-throw-hover;
   }
 }

@@ -34,25 +34,25 @@ describe('ErrorBoundary', () => {
   });
 
   it('reloads the page when clicking "Try again"', () => {
-  const mockReload = jest.fn();
+    const mockReload = jest.fn();
 
-  const ProblemChild = () => {
-    throw new Error('Reload test error');
-  };
+    const ProblemChild = () => {
+      throw new Error('Reload test error');
+    };
 
-  const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
-  render(
-    <ErrorBoundary reloadFn={mockReload}>
-      <ProblemChild />
-    </ErrorBoundary>
-  );
+    render(
+      <ErrorBoundary reloadFn={mockReload}>
+        <ProblemChild />
+      </ErrorBoundary>
+    );
 
-  const button = screen.getByRole('button', { name: /try again/i });
-  fireEvent.click(button);
+    const button = screen.getByRole('button', { name: /try again/i });
+    fireEvent.click(button);
 
-  expect(mockReload).toHaveBeenCalled();
+    expect(mockReload).toHaveBeenCalled();
 
-  errorSpy.mockRestore();
-})
+    errorSpy.mockRestore();
+  });
 });
