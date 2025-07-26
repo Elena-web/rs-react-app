@@ -3,11 +3,21 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import CardList from './CardList';
 
-jest.mock('../Card/Card', () => (props: { title: string; imageUrl?: string }) => (
-  <div data-testid="card">{props.title}</div>
-));
+jest.mock(
+  '../Card/Card',
+  () =>
+    function MockCard(props: { title: string; imageUrl?: string }) {
+      return <div data-testid="card">{props.title}</div>;
+    }
+);
 
-jest.mock('../CardSkeleton/CardSkeleton', () => () => <div data-testid="card-skeleton">Loading...</div>);
+jest.mock(
+  '../CardSkeleton/CardSkeleton',
+  () =>
+    function MockCardSkeleton() {
+      return <div data-testid="card-skeleton">Loading...</div>;
+    }
+);
 
 describe('CardList component', () => {
   it('renders Card components when not loading', () => {
@@ -32,5 +42,12 @@ describe('CardList component', () => {
     skeletons.forEach((skeleton) => {
       expect(skeleton).toHaveTextContent('Loading...');
     });
+  });
+
+  it('renders nothing when items list is empty and loading is false', () => {
+    render(<CardList items={[]} loading={false} />);
+
+    const cards = screen.queryAllByTestId('card');
+    expect(cards).toHaveLength(0);
   });
 });
