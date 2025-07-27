@@ -1,7 +1,7 @@
 .search {
   display: flex;
   justify-content: center;
-  gap: 1rem;  
+  gap: 1rem;
 }
 
 .input {
@@ -10,9 +10,11 @@
   border-radius: 6px;
   border: 1px solid $color-input-border;
   width: 250px;
-  color: $color-input-text; 
+  color: $color-input-text;
   background-color: $color-input-background;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
 
   &::placeholder {
     color: $color-placeholder;
@@ -39,9 +41,9 @@
   font-weight: 500;
   color: $color-white;
   @include pulse-animation;
-  
+
   &:hover {
-	color: $color-pink; 
+    color: $color-pink;
     text-shadow: none;
   }
 }

@@ -5,7 +5,7 @@ import '@testing-library/jest-dom';
 import Header from './Header';
 
 jest.mock('../Search/Search', () => ({
-  __esModule: true, 
+  __esModule: true,
   default: ({ onSearch }: { onSearch: (term: string) => void }) => (
     <button onClick={() => onSearch('Maine Coon')}>Mock Search</button>
   ),

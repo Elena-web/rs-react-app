@@ -11,29 +11,27 @@ interface CardListProps {
   loading?: boolean;
 }
 
-class CardList extends React.Component<CardListProps> {
-  render() {
-    if (this.props.loading) {
-      return (
-        <div className={s.wrapper} data-testid="loader">
-          <CardSkeleton />
-          <CardSkeleton />
-          <CardSkeleton />
-          <CardSkeleton />
-          <CardSkeleton />
-          <CardSkeleton />
-        </div>
-      );
-    }
-
+const CardList: React.FC<CardListProps> = ({ items, loading }) => {
+  if (loading) {
     return (
-      <div className={s.wrapper}>
-        {this.props.items.map((item, index) => (
-          <Card key={index} title={item.title} imageUrl={item.imageUrl} />
-        ))}
+      <div className={s.wrapper} data-testid="loader">
+        <CardSkeleton />
+        <CardSkeleton />
+        <CardSkeleton />
+        <CardSkeleton />
+        <CardSkeleton />
+        <CardSkeleton />
       </div>
     );
   }
-}
+
+  return (
+    <div className={s.wrapper}>
+      {items.map((item, index) => (
+        <Card key={index} title={item.title} imageUrl={item.imageUrl} />
+      ))}
+    </div>
+  );
+};
 
 export default CardList;
