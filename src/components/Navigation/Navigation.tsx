@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom';
 import pawIcon from '../../assets/icon-paw.png';
 import s from './Navigation.module.scss';
 
-function Navigation() {
+const Navigation = () => {
   return (
     <nav className={s.nav}>
       <NavLink to="/" className={s.logo}>
@@ -29,6 +29,6 @@ function Navigation() {
       </div>
     </nav>
   );
-}
+};
 
 export default Navigation;

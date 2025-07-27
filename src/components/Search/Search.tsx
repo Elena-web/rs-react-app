@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
+import useLocalStorage from '../../hooks/useLocalStorage';
 import s from './Search.module.scss';
 
 interface SearchProps {
@@ -6,18 +7,14 @@ interface SearchProps {
 }
 
 const Search: React.FC<SearchProps> = ({ onSearch }) => {
-  const [searchTerm, setSearchTerm] = useState(
-    () => localStorage.getItem('searchTerm') || ''
-  );
+  const [searchTerm, setSearchTerm] = useLocalStorage<string>('searchTerm', '');
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
   };
 
   const handleSearch = () => {
-    const trimmed = searchTerm.trim();
-    onSearch(trimmed);
-    localStorage.setItem('searchTerm', trimmed);
+    onSearch(searchTerm.trim());
   };
 
   return (

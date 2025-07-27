@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import useLocalStorage from '../../hooks/useLocalStorage';
 import CardList from '../CardList/CardList';
 import Header from '../Header/Header';
 import s from './MainBlock.module.scss';
@@ -15,14 +16,13 @@ const MainBlock: React.FC = () => {
   const [items, setItems] = useState<CatCard[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [query, setQuery] = useState(localStorage.getItem('searchTerm') || '');
+  const [query, setQuery] = useLocalStorage<string>('searchTerm', '');
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
   const [fatalError, setFatalError] = useState(false);
 
   const fetchData = useCallback(async () => {
     const trimmed = query.trim();
-    localStorage.setItem('searchTerm', trimmed);
 
     setLoading(true);
     setError(null);
