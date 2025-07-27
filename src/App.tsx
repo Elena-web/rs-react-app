@@ -1,16 +1,17 @@
 import React from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
-import MainBlock from './components/MainBlock/MainBlock';
-import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navigation from './components/Navigation/Navigation';
+import Home from './pages/Home/Home';
+import NotFound from './pages/NotFound/NotFound';
 
 const App: React.FC = () => {
   return (
     <Router>
-      <ErrorBoundary>
-        <Navigation />
-        <MainBlock />
-      </ErrorBoundary>
+      <Navigation />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
     </Router>
   );
 };
