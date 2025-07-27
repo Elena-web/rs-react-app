@@ -9,7 +9,7 @@ describe('Search component', () => {
   });
 
   test('renders input with value from localStorage if present', () => {
-    localStorage.setItem('searchTerm', 'Bengal');
+    localStorage.setItem('searchTerm', JSON.stringify('Bengal'));
 
     const mockOnSearch = jest.fn();
     render(<Search onSearch={mockOnSearch} />);
@@ -42,6 +42,9 @@ describe('Search component', () => {
 
     expect(mockOnSearch).toHaveBeenCalledWith('Maine Coon');
     expect(mockOnSearch).toHaveBeenCalledTimes(1);
-    expect(localStorage.getItem('searchTerm')).toBe('Maine Coon');
+
+    const stored = localStorage.getItem('searchTerm');
+    expect(stored).not.toBeNull();
+    expect(JSON.parse(stored ?? '')).toBe('Maine Coon');
   });
 });
