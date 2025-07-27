@@ -1,0 +1,11 @@
+@mixin pulse-animation {
+  @keyframes pulse {
+    0% { box-shadow: 0 0 5px $color-pink; }
+    50% { box-shadow: 0 0 20px $color-pink; }
+    100% { box-shadow: 0 0 5px $color-pink; }
+  }
+
+  & {
+    animation: pulse 1s infinite;
+  }
+}

@@ -1,4 +1,21 @@
-$color-white: #fff;
+$font-header-family: 'Roboto', sans-serif;
+$transition-all: all 0.3s ease;
+
+$color-pink: #ff00cc;
+$color-light-pink: #fff1f5;
+$color-background: #ffe3ec;
+$color-dark-blue: #1a1a2e;
+$color-dark-purple: #28285f;
+$color-white: #ffffff;
+$color-gray: #5c5c5c;
+$color-border: rgba(255, 192, 203, 0.2);
+$color-input-border: rgba(255, 192, 203, 0.5);
+$color-input-focus: $color-pink;
+$color-neutral-bg: #e0e0e0;
+$color-placeholder: #9b9d9f;
+$color-input-text: black;
+$color-input-background: #fdf6fb;
+$color-input-focus-bg: #fff0f8;
 
 // ErrorBoundary style
 $color-error-bg: #ffebee;        
@@ -8,20 +25,6 @@ $color-error-heading: #b71c1c;
 $color-error-details-text: #e53935;  
 $color-error-details-bg: #ffcdd2;    
 $color-error-hover: #e53935;
-
-// skeleton style
-$color-neutral-bg: #e0e0e0;
-
-// card style
-$color-card-shadow: rgba(0, 0, 0, 0.1);
-$color-description-text: #555555;
-
-// Header style
-$color-header-bg: #f4f4f4;
-$color-header-border: #ccc;
-$color-header-title: #333;
-$color-header-subtitle: #666;
-$font-header-family: 'Roboto', sans-serif;
 
 // Loading & error
 $color-info: #2563eb;
@@ -37,11 +40,5 @@ $color-pagination-active: #3b82f6;
 $color-throw-bg: #ef4444;
 $color-throw-hover: #dc2626;
 
-// Search input
-$color-input-border: #ccc;
-$color-input-focus: #2563eb;
 
-// Search button
-$color-button-bg: #2563eb;
-$color-button-hover: #1e40af;
-$color-button-text: $color-white;
+
