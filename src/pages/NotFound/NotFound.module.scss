@@ -1,17 +1,18 @@
 .container {
   display: flex;
-  flex-direction: column;	
+  flex-direction: column;
   align-items: center;
-  justify-content: center; 
+  justify-content: center;
   font-family: $font-header-family;
   height: 100vh;
 }
 
 .content {
-  text-align: center; 
+  text-align: center;
 }
 
-.title, .txt {
+.title,
+.txt {
   font-size: 2.5rem;
   margin-bottom: 0.5rem;
   color: $color-pink;

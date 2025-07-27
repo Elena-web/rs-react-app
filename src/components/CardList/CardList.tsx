@@ -5,6 +5,7 @@ import s from './CardList.module.scss';
 
 interface CardListProps {
   items: Array<{
+    id: string;
     title: string;
     imageUrl?: string;
   }>;
@@ -27,8 +28,13 @@ const CardList: React.FC<CardListProps> = ({ items, loading }) => {
 
   return (
     <div className={s.wrapper}>
-      {items.map((item, index) => (
-        <Card key={index} title={item.title} imageUrl={item.imageUrl} />
+      {items.map((item) => (
+        <Card
+          key={`${item.id}-${item.imageUrl}`}
+          id={item.id}
+          title={item.title}
+          imageUrl={item.imageUrl}
+        />
       ))}
     </div>
   );

@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import pawIcon from '../../assets/icon-paw.png';
+import pawIcon from '@assets/icon-paw.png';
 import s from './Navigation.module.scss';
 
 const Navigation = () => {
@@ -10,20 +10,10 @@ const Navigation = () => {
         <p>Cats</p>
       </NavLink>
       <div className={s.container}>
-        <NavLink
-          to="/"
-          className={({ isActive }) =>
-            isActive ? `${s.link} ${s.active}` : s.link
-          }
-        >
+        <NavLink to="/" className={s.link}>
           Home
         </NavLink>
-        <NavLink
-          to="/about"
-          className={({ isActive }) =>
-            isActive ? `${s.link} ${s.active}` : s.link
-          }
-        >
+        <NavLink to="/about" className={s.link}>
           About
         </NavLink>
       </div>

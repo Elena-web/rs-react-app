@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import useLocalStorage from '../../hooks/useLocalStorage';
+import { Outlet, useMatch } from 'react-router-dom';
+import useLocalStorage from '@hooks/useLocalStorage';
 import CardList from '../CardList/CardList';
 import Header from '../Header/Header';
 import s from './MainBlock.module.scss';
 
-import { fetchBreedsByQuery, fetchCatImages } from '../../api/catApi';
+import { fetchBreedsByQuery, fetchCatImages } from '@api/catApi';
 
 interface CatCard {
   id: string;
@@ -18,8 +19,9 @@ const MainBlock: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useLocalStorage<string>('searchTerm', '');
   const [page, setPage] = useState(1);
-  const [limit] = useState(10);
+  const [limit] = useState(9);
   const [fatalError, setFatalError] = useState(false);
+  const showDetail = useMatch('/details/:id');
 
   const fetchData = useCallback(async () => {
     const trimmed = query.trim();
@@ -38,7 +40,7 @@ const MainBlock: React.FC = () => {
       const imageData = await fetchCatImages(limit, page, breedIds);
 
       const formatted: CatCard[] = imageData.map((item) => ({
-        id: item.id,
+        id: item.breeds?.[0]?.id || item.id,
         imageUrl: item.url,
         title: item.breeds?.[0]?.name || 'Funny cat',
       }));
@@ -85,7 +87,18 @@ const MainBlock: React.FC = () => {
       )}
 
       <section className={s.results}>
-        <CardList items={items} loading={loading} />
+        {showDetail ? (
+          <div className={s.split}>
+            <div className={s.list}>
+              <CardList items={items} loading={loading} />
+            </div>
+            <div className={s.detail}>
+              <Outlet />
+            </div>
+          </div>
+        ) : (
+          <CardList items={items} loading={loading} />
+        )}
       </section>
 
       <div className={s.pagination}>
@@ -98,7 +111,8 @@ const MainBlock: React.FC = () => {
         </button>
         <button
           onClick={handleNextPage}
-          className={`${s.pageButton} ${s.pageNext}`}
+          className={`${s.pageButton}
+		${s.pageNext}`}
         >
           Next →
         </button>

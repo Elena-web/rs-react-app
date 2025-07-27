@@ -70,3 +70,22 @@
     background-color: $color-throw-hover;
   }
 }
+
+.results {
+  margin-top: 24px;
+}
+
+.split {
+  display: flex;
+  gap: 24px;
+}
+
+.list {
+  flex: 1;
+}
+
+.detail {
+  flex: 1;
+  max-width: 30%;
+  padding-left: 16px;
+}

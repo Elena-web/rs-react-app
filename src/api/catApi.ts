@@ -26,7 +26,11 @@ export async function fetchBreedsByQuery(
     `https://api.thecatapi.com/v1/breeds/search?q=${encodeURIComponent(query)}`,
     { headers }
   );
-  if (!response.ok) throw new Error('Failed to fetch breeds');
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch breeds');
+  }
+
   return response.json();
 }
 
@@ -40,6 +44,30 @@ export async function fetchCatImages(
     `https://api.thecatapi.com/v1/images/search?limit=${limit}&page=${page}${breedParam}`,
     { headers }
   );
-  if (!response.ok) throw new Error('Failed to fetch images');
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch images');
+  }
+
   return response.json();
+}
+
+export async function fetchBreedDetail(
+  id: string
+): Promise<{ breed: BreedResponse; imageUrl: string | null }> {
+  const breedResponse = await fetch(
+    `https://api.thecatapi.com/v1/breeds/${id}`,
+    { headers }
+  );
+
+  if (!breedResponse.ok) {
+    throw new Error(`Breed with id "${id}" not found`);
+  }
+
+  const breed: BreedResponse = await breedResponse.json();
+
+  const images = await fetchCatImages(1, 0, [id]);
+  const imageUrl = images.length > 0 ? images[0].url : null;
+
+  return { breed, imageUrl };
 }

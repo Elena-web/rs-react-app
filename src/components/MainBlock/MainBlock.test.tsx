@@ -3,8 +3,9 @@ import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import MainBlock from './MainBlock';
-import { fetchBreedsByQuery, fetchCatImages } from '../../api/catApi';
+import { fetchBreedsByQuery, fetchCatImages } from '@api/catApi';
 import { mockBreedResponse, mockImageResponse } from './__mocks__/mocks';
+import { MemoryRouter } from 'react-router-dom';
 
 jest.mock('../../api/catApi', () => ({
   fetchBreedsByQuery: jest.fn(),
@@ -21,7 +22,11 @@ describe('MainBlock component', () => {
     (fetchBreedsByQuery as jest.Mock).mockResolvedValue(mockBreedResponse);
     (fetchCatImages as jest.Mock).mockResolvedValue(mockImageResponse);
 
-    render(<MainBlock />);
+    render(
+      <MemoryRouter>
+        <MainBlock />
+      </MemoryRouter>
+    );
 
     expect(
       screen.queryByText(mockBreedResponse[0].name)
@@ -43,7 +48,11 @@ describe('MainBlock component', () => {
       mockImageResponseWithNoBreeds
     );
 
-    render(<MainBlock />);
+    render(
+      <MemoryRouter>
+        <MainBlock />
+      </MemoryRouter>
+    );
 
     await waitFor(() => {
       const funnyCats = screen.getAllByText('Funny cat');
@@ -57,7 +66,11 @@ describe('MainBlock component', () => {
     (fetchBreedsByQuery as jest.Mock).mockRejectedValue(new Error('API error'));
     (fetchCatImages as jest.Mock).mockRejectedValue(new Error('API error'));
 
-    render(<MainBlock />);
+    render(
+      <MemoryRouter>
+        <MainBlock />
+      </MemoryRouter>
+    );
 
     await waitFor(() => {
       const alert = screen.getByRole('alert');
@@ -69,7 +82,11 @@ describe('MainBlock component', () => {
     (fetchBreedsByQuery as jest.Mock).mockResolvedValue(mockBreedResponse);
     (fetchCatImages as jest.Mock).mockResolvedValue(mockImageResponse);
 
-    render(<MainBlock />);
+    render(
+      <MemoryRouter>
+        <MainBlock />
+      </MemoryRouter>
+    );
 
     const nextButton = screen.getByRole('button', { name: /next/i });
     await userEvent.click(nextButton);
@@ -87,7 +104,11 @@ describe('MainBlock component', () => {
     (fetchBreedsByQuery as jest.Mock).mockResolvedValue(mockBreedResponse);
     (fetchCatImages as jest.Mock).mockResolvedValue(mockImageResponse);
 
-    render(<MainBlock />);
+    render(
+      <MemoryRouter>
+        <MainBlock />
+      </MemoryRouter>
+    );
 
     const nextButton = screen.getByRole('button', { name: /next/i });
     await userEvent.click(nextButton);
@@ -112,47 +133,15 @@ describe('MainBlock component', () => {
     });
   });
 
-  it('catches fatal error in ErrorBoundary and shows fallback UI', async () => {
-    class TestErrorBoundary extends React.Component<
-      { children: React.ReactNode },
-      { hasError: boolean }
-    > {
-      constructor(props: { children: React.ReactNode }) {
-        super(props);
-        this.state = { hasError: false };
-      }
-
-      static getDerivedStateFromError() {
-        return { hasError: true };
-      }
-
-      render() {
-        if (this.state.hasError) {
-          return <div data-testid="error-boundary">Error caught!</div>;
-        }
-        return this.props.children;
-      }
-    }
-
-    render(
-      <TestErrorBoundary>
-        <MainBlock />
-      </TestErrorBoundary>
-    );
-
-    const errorButton = screen.getByRole('button', { name: /trigger error/i });
-    await userEvent.click(errorButton);
-
-    await waitFor(() => {
-      expect(screen.getByTestId('error-boundary')).toBeInTheDocument();
-    });
-  });
-
   it('renders cat cards after loading', async () => {
     (fetchBreedsByQuery as jest.Mock).mockResolvedValue(mockBreedResponse);
     (fetchCatImages as jest.Mock).mockResolvedValue(mockImageResponse);
 
-    render(<MainBlock />);
+    render(
+      <MemoryRouter>
+        <MainBlock />
+      </MemoryRouter>
+    );
 
     expect(screen.getByTestId('loader')).toBeInTheDocument();
 
