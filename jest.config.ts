@@ -5,6 +5,7 @@ const config: Config = {
   testEnvironment: 'jsdom',
   testMatch: ['**/*.test.tsx', '**/*.spec.tsx'],
   moduleNameMapper: {
+    '\\.module\\.(css|scss|sass)$': 'identity-obj-proxy',
     '\\.(css|scss|sass)$': '<rootDir>/__mocks__/styleMock.js',
   },
   collectCoverage: true,

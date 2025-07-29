@@ -17,7 +17,7 @@
     "types": ["jest", "node"]
   },
   "include": [
-    "types/scss.d.ts",
+    "src/types/scss.d.ts",
     "types/vite-env.d.ts"
   ],
   "exclude": ["node_modules"]
