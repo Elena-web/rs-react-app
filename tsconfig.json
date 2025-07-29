@@ -16,9 +16,6 @@
     "lib": ["DOM", "ESNext"],
     "types": ["jest", "node"]
   },
-  "include": [
-    "src/types/scss.d.ts",
-    "types/vite-env.d.ts"
-  ],
+  "include": ["src/types/scss.d.ts", "types/vite-env.d.ts"],
   "exclude": ["node_modules"]
 }

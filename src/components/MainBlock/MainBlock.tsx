@@ -1,51 +1,41 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Outlet, useMatch } from 'react-router-dom';
+import { Outlet, useMatch, useNavigate, useLocation } from 'react-router-dom';
+
 import useLocalStorage from '../../hooks/useLocalStorage';
-import CardList from '../CardList/CardList';
 import Header from '../Header/Header';
+import CardList from '../CardList/CardList';
+import Pagination from '../Pagination/Pagination';
+
+import { fetchCatCards } from '../../api/catApi';
 import s from './MainBlock.module.scss';
 
-import { fetchBreedsByQuery, fetchCatImages } from '../../api/catApi';
-
-interface CatCard {
-  id: string;
-  imageUrl: string;
-  title: string;
-}
+import type { CatCard } from '../../api/catApi';
 
 const MainBlock: React.FC = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const searchParams = new URLSearchParams(location.search);
+  const pageParam = searchParams.get('page');
+  const currentPage = Math.max(parseInt(pageParam || '1', 10), 1);
+
+  const showDetail = useMatch('/details/:id');
+
+  const [query, setQuery] = useLocalStorage<string>('searchTerm', '');
   const [items, setItems] = useState<CatCard[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [query, setQuery] = useLocalStorage<string>('searchTerm', '');
-  const [page, setPage] = useState(1);
-  const [limit] = useState(9);
   const [fatalError, setFatalError] = useState(false);
-  const showDetail = useMatch('/details/:id');
+  const [totalPages, setTotalPages] = useState(1);
 
   const fetchData = useCallback(async () => {
-    const trimmed = query.trim();
-
     setLoading(true);
     setError(null);
 
     try {
-      let breedIds: string[] = [];
-
-      if (trimmed) {
-        const breedData = await fetchBreedsByQuery(trimmed);
-        breedIds = breedData.map((breed) => breed.id);
-      }
-
-      const imageData = await fetchCatImages(limit, page, breedIds);
-
-      const formatted: CatCard[] = imageData.map((item) => ({
-        id: item.breeds?.[0]?.id || item.id,
-        imageUrl: item.url,
-        title: item.breeds?.[0]?.name || 'Funny cat',
-      }));
-
-      setItems(formatted);
+      const { cards, totalPages } = await fetchCatCards(query, currentPage);
+      setItems(cards);
+      setTotalPages(totalPages);
     } catch (err) {
       const errorMessage = (err as Error).message || 'Failed to retrieve data.';
       console.error(errorMessage);
@@ -53,7 +43,7 @@ const MainBlock: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [query, page, limit]);
+  }, [query, currentPage]);
 
   useEffect(() => {
     fetchData();
@@ -61,15 +51,21 @@ const MainBlock: React.FC = () => {
 
   const handleSearch = (newQuery: string) => {
     setQuery(newQuery.trim());
-    setPage(1);
+    navigate(`/?page=1`);
   };
 
-  const handleNextPage = () => {
-    setPage((prev) => prev + 1);
-  };
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      const params = new URLSearchParams(location.search);
 
-  const handlePrevPage = () => {
-    setPage((prev) => Math.max(prev - 1, 1));
+      if (page === 1) {
+        params.delete('page');
+      } else {
+        params.set('page', page.toString());
+      }
+
+      navigate({ pathname: location.pathname, search: params.toString() });
+    }
   };
 
   if (fatalError) {
@@ -101,22 +97,11 @@ const MainBlock: React.FC = () => {
         )}
       </section>
 
-      <div className={s.pagination}>
-        <button
-          onClick={handlePrevPage}
-          disabled={page === 1}
-          className={s.pageButton}
-        >
-          ← Previous
-        </button>
-        <button
-          onClick={handleNextPage}
-          className={`${s.pageButton}
-		${s.pageNext}`}
-        >
-          Next →
-        </button>
-      </div>
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+      />
 
       <div className={s.errorButton}>
         <button onClick={() => setFatalError(true)} className={s.throwButton}>

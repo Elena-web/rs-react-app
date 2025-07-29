@@ -2,13 +2,12 @@ import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import MainBlock from './MainBlock';
-import { fetchBreedsByQuery, fetchCatImages } from '../../api/catApi';
-import { mockBreedResponse, mockImageResponse } from './__mocks__/mocks';
+import { fetchCatCards } from '../../api/catApi';
+import { mockImageResponse } from './__mocks__/mocks';
 import { MemoryRouter } from 'react-router-dom';
 
 jest.mock('../../api/catApi', () => ({
-  fetchBreedsByQuery: jest.fn(),
-  fetchCatImages: jest.fn(),
+  fetchCatCards: jest.fn(),
 }));
 
 describe('MainBlock component', () => {
@@ -17,9 +16,17 @@ describe('MainBlock component', () => {
     localStorage.clear();
   });
 
+  const mockCards = mockImageResponse.map((img) => ({
+    id: img.id,
+    imageUrl: img.url,
+    title: img.breeds?.[0]?.name || 'Funny cat',
+  }));
+
   it('renders cat cards after loading', async () => {
-    (fetchBreedsByQuery as jest.Mock).mockResolvedValue(mockBreedResponse);
-    (fetchCatImages as jest.Mock).mockResolvedValue(mockImageResponse);
+    (fetchCatCards as jest.Mock).mockResolvedValue({
+      cards: mockCards,
+      totalPages: 3,
+    });
 
     render(
       <MemoryRouter>
@@ -27,25 +34,23 @@ describe('MainBlock component', () => {
       </MemoryRouter>
     );
 
-    expect(
-      screen.queryByText(mockBreedResponse[0].name)
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText(mockCards[0].title)).not.toBeInTheDocument();
 
     await waitFor(() => {
-      expect(screen.getByText(mockBreedResponse[0].name)).toBeInTheDocument();
+      expect(screen.getByText(mockCards[0].title)).toBeInTheDocument();
     });
   });
 
   it('renders "Funny cat" when images have no breeds', async () => {
-    const mockImageResponseWithNoBreeds = [
-      { id: '1', url: 'image1.jpg', breeds: [] },
-      { id: '2', url: 'image2.jpg', breeds: [] },
+    const mockFunnyCats = [
+      { id: '1', imageUrl: 'image1.jpg', title: 'Funny cat' },
+      { id: '2', imageUrl: 'image2.jpg', title: 'Funny cat' },
     ];
 
-    (fetchBreedsByQuery as jest.Mock).mockResolvedValue(mockBreedResponse);
-    (fetchCatImages as jest.Mock).mockResolvedValue(
-      mockImageResponseWithNoBreeds
-    );
+    (fetchCatCards as jest.Mock).mockResolvedValue({
+      cards: mockFunnyCats,
+      totalPages: 1,
+    });
 
     render(
       <MemoryRouter>
@@ -62,8 +67,7 @@ describe('MainBlock component', () => {
   it('displays error alert on API failure', async () => {
     jest.spyOn(console, 'error').mockImplementation(() => {});
 
-    (fetchBreedsByQuery as jest.Mock).mockRejectedValue(new Error('API error'));
-    (fetchCatImages as jest.Mock).mockRejectedValue(new Error('API error'));
+    (fetchCatCards as jest.Mock).mockRejectedValue(new Error('API error'));
 
     render(
       <MemoryRouter>
@@ -78,8 +82,10 @@ describe('MainBlock component', () => {
   });
 
   it('increments page when clicking Next button', async () => {
-    (fetchBreedsByQuery as jest.Mock).mockResolvedValue(mockBreedResponse);
-    (fetchCatImages as jest.Mock).mockResolvedValue(mockImageResponse);
+    (fetchCatCards as jest.Mock).mockResolvedValue({
+      cards: mockCards,
+      totalPages: 5,
+    });
 
     render(
       <MemoryRouter>
@@ -91,50 +97,35 @@ describe('MainBlock component', () => {
     await userEvent.click(nextButton);
 
     await waitFor(() => {
-      expect(fetchCatImages).toHaveBeenCalledWith(
-        expect.any(Number),
-        2,
-        expect.any(Array)
-      );
+      expect(fetchCatCards).toHaveBeenCalledWith(expect.any(String), 2);
     });
   });
 
   it('decrements page when clicking Previous button', async () => {
-    (fetchBreedsByQuery as jest.Mock).mockResolvedValue(mockBreedResponse);
-    (fetchCatImages as jest.Mock).mockResolvedValue(mockImageResponse);
+    (fetchCatCards as jest.Mock).mockResolvedValue({
+      cards: mockCards,
+      totalPages: 5,
+    });
 
     render(
-      <MemoryRouter>
+      <MemoryRouter initialEntries={['/?page=2']}>
         <MainBlock />
       </MemoryRouter>
     );
-
-    const nextButton = screen.getByRole('button', { name: /next/i });
-    await userEvent.click(nextButton);
-
-    await waitFor(() => {
-      expect(fetchCatImages).toHaveBeenCalledWith(
-        expect.any(Number),
-        2,
-        expect.any(Array)
-      );
-    });
 
     const prevButton = screen.getByRole('button', { name: /previous/i });
     await userEvent.click(prevButton);
 
     await waitFor(() => {
-      expect(fetchCatImages).toHaveBeenCalledWith(
-        expect.any(Number),
-        1,
-        expect.any(Array)
-      );
+      expect(fetchCatCards).toHaveBeenCalledWith(expect.any(String), 1);
     });
   });
 
-  it('renders cat cards after loading', async () => {
-    (fetchBreedsByQuery as jest.Mock).mockResolvedValue(mockBreedResponse);
-    (fetchCatImages as jest.Mock).mockResolvedValue(mockImageResponse);
+  it('shows loader during fetch and hides after', async () => {
+    (fetchCatCards as jest.Mock).mockResolvedValue({
+      cards: mockCards,
+      totalPages: 3,
+    });
 
     render(
       <MemoryRouter>
@@ -146,7 +137,6 @@ describe('MainBlock component', () => {
 
     await waitFor(() => {
       expect(screen.queryByTestId('loader')).not.toBeInTheDocument();
-      expect(screen.getByText(mockBreedResponse[0].name)).toBeInTheDocument();
     });
   });
 });
