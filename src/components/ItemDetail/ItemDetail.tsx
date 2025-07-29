@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import s from './ItemDetail.module.scss';
 
-import type { BreedResponse } from '@api/catApi';
-import { fetchBreedDetail } from '@api/catApi';
+import type { BreedResponse } from '../../api/catApi';
+import { fetchBreedDetail } from '../../api/catApi';
 
 const ItemDetail: React.FC = () => {
   const { id } = useParams<{ id?: string }>();

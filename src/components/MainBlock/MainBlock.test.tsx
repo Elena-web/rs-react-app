@@ -1,9 +1,8 @@
-import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import MainBlock from './MainBlock';
-import { fetchBreedsByQuery, fetchCatImages } from '@api/catApi';
+import { fetchBreedsByQuery, fetchCatImages } from '../../api/catApi';
 import { mockBreedResponse, mockImageResponse } from './__mocks__/mocks';
 import { MemoryRouter } from 'react-router-dom';
 

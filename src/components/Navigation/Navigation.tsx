@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import pawIcon from '@assets/icon-paw.png';
+import pawIcon from '../../assets/icon-paw.png';
 import s from './Navigation.module.scss';
 
 const Navigation = () => {

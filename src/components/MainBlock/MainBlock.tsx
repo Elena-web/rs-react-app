@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Outlet, useMatch } from 'react-router-dom';
-import useLocalStorage from '@hooks/useLocalStorage';
+import useLocalStorage from '../../hooks/useLocalStorage';
 import CardList from '../CardList/CardList';
 import Header from '../Header/Header';
 import s from './MainBlock.module.scss';
 
-import { fetchBreedsByQuery, fetchCatImages } from '@api/catApi';
+import { fetchBreedsByQuery, fetchCatImages } from '../../api/catApi';
 
 interface CatCard {
   id: string;

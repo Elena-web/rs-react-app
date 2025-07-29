@@ -5,27 +5,20 @@
     { "path": "./tsconfig.node.json" }
   ],
   "compilerOptions": {
+    "outDir": "./dist",
     "moduleResolution": "node",
     "composite": true,
-    "noEmit": false,
     "esModuleInterop": true,
     "jsx": "react",
     "module": "esnext",
     "target": "es6",
     "strict": true,
     "lib": ["DOM", "ESNext"],
-    "types": ["jest", "node"],
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["src/*"],
-      "@api/*": ["src/api/*"],
-      "@components/*": ["src/components/*"],
-      "@hooks/*": ["src/hooks/*"],
-      "@pages/*": ["src/pages/*"],
-      "@styles/*": ["src/styles/*"],
-      "@assets/*": ["src/assets/*"]
-    }
+    "types": ["jest", "node"]
   },
-  "include": ["src/**/*", "types/scss.d.ts", "types/vite-env.d.ts"],
+  "include": [
+    "types/scss.d.ts",
+    "types/vite-env.d.ts"
+  ],
   "exclude": ["node_modules"]
 }

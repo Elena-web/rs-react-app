@@ -4,6 +4,9 @@ const config: Config = {
   preset: 'ts-jest',
   testEnvironment: 'jsdom',
   testMatch: ['**/*.test.tsx', '**/*.spec.tsx'],
+  moduleNameMapper: {
+    '\\.(css|scss|sass)$': '<rootDir>/__mocks__/styleMock.js',
+  },
   collectCoverage: true,
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'json', 'html'],
@@ -21,17 +24,6 @@ const config: Config = {
     '<rootDir>/src/setupTests.ts',
     '\\.d\\.ts$',
   ],
-  moduleNameMapper: {
-    '\\.(css|scss|sass)$': '<rootDir>/__mocks__/styleMock.js',
-
-    '^@/(.*)$': '<rootDir>/src/$1',
-    '^@api/(.*)$': '<rootDir>/src/api/$1',
-    '^@components/(.*)$': '<rootDir>/src/components/$1',
-    '^@hooks/(.*)$': '<rootDir>/src/hooks/$1',
-    '^@pages/(.*)$': '<rootDir>/src/pages/$1',
-    '^@styles/(.*)$': '<rootDir>/src/styles/$1',
-    '^@assets/(.*)$': '<rootDir>/src/assets/$1',
-  },
   setupFilesAfterEnv: ['<rootDir>/src/jest.setup.ts'],
 };
 
