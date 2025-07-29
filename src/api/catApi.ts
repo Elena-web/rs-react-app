@@ -55,16 +55,21 @@ export async function fetchCatImages(
 export async function fetchBreedDetail(
   id: string
 ): Promise<{ breed: BreedResponse; imageUrl: string | null }> {
-  const breedResponse = await fetch(
-    `https://api.thecatapi.com/v1/breeds/${id}`,
-    { headers }
-  );
+  const breedsResponse = await fetch('https://api.thecatapi.com/v1/breeds', {
+    headers,
+  });
 
-  if (!breedResponse.ok) {
-    throw new Error(`Breed with id "${id}" not found`);
+  if (!breedsResponse.ok) {
+    throw new Error('Failed to fetch breeds list');
   }
 
-  const breed: BreedResponse = await breedResponse.json();
+  const breeds: BreedResponse[] = await breedsResponse.json();
+
+  const breed = breeds.find((b) => b.id === id);
+
+  if (!breed) {
+    throw new Error(`Breed with id "${id}" not found`);
+  }
 
   const images = await fetchCatImages(1, 0, [id]);
   const imageUrl = images.length > 0 ? images[0].url : null;
