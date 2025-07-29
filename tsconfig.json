@@ -9,7 +9,7 @@
     "moduleResolution": "node",
     "composite": true,
     "esModuleInterop": true,
-    "jsx": "react",
+    "jsx": "react-jsx",
     "module": "esnext",
     "target": "es6",
     "strict": true,
