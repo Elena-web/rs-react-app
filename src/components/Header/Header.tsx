@@ -4,9 +4,10 @@ import Search from '../Search/Search';
 
 interface HeaderProps {
   onSearch: (term: string) => void;
+  defaultValue?: string;
 }
 
-const Header: React.FC<HeaderProps> = ({ onSearch }) => {
+const Header: React.FC<HeaderProps> = ({ onSearch, defaultValue }) => {
   return (
     <header className={s.header}>
       <h1 className={s.title}>Discover Your Perfect Breed</h1>
@@ -16,7 +17,7 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
       <p className={s.subtitle}>
         For example: Maine, Bengal, Sphynx, Norwegian, Persian, Ocicat, etc.
       </p>
-      <Search onSearch={onSearch} />
+      <Search onSearch={onSearch} defaultValue={defaultValue} />
     </header>
   );
 };

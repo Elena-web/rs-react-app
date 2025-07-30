@@ -4,7 +4,7 @@ fetchMock.enableMocks();
 import {
   fetchBreedsByQuery,
   fetchCatImages,
-  fetchBreedDetail,
+  fetchBreedAndImageUrl,
   fetchTotalImageCount,
 } from './catApi';
 
@@ -86,7 +86,7 @@ describe('catApi functions', () => {
     });
   });
 
-  describe('fetchBreedDetail', () => {
+  describe('fetchBreedAndImageUrl', () => {
     it('fetches breed details and image url', async () => {
       const mockBreeds: MockBreed[] = [
         { id: 'abc', name: 'Siberian', description: 'desc' },
@@ -105,7 +105,7 @@ describe('catApi functions', () => {
         [JSON.stringify(mockImages), { status: 200 }]
       );
 
-      const result = await fetchBreedDetail('abc');
+      const result = await fetchBreedAndImageUrl('abc');
 
       expect(fetchMock).toHaveBeenNthCalledWith(
         1,
@@ -126,7 +126,7 @@ describe('catApi functions', () => {
 
       fetchMock.mockResponseOnce(JSON.stringify(mockBreeds));
 
-      await expect(fetchBreedDetail('abc')).rejects.toThrow(
+      await expect(fetchBreedAndImageUrl('abc')).rejects.toThrow(
         'Breed with id "abc" not found'
       );
     });
@@ -134,7 +134,7 @@ describe('catApi functions', () => {
     it('throws error on breeds fetch failure', async () => {
       fetchMock.mockResponseOnce('', { status: 500 });
 
-      await expect(fetchBreedDetail('abc')).rejects.toThrow(
+      await expect(fetchBreedAndImageUrl('abc')).rejects.toThrow(
         'Failed to fetch breeds list'
       );
     });

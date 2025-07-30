@@ -25,7 +25,8 @@ const MainBlock: React.FC = () => {
   const [query, setQuery] = useLocalStorage<string>('searchTerm', '');
   const [totalPages, setTotalPages] = useState(1);
   const [fatalError, setFatalError] = useState(false);
-  const [limit] = useState(9);
+
+  const limit = 9;
   const showDetail = useMatch('/details/:id');
 
   const location = useLocation();
@@ -55,8 +56,7 @@ const MainBlock: React.FC = () => {
         fetchTotalImageCount(breedIds),
       ]);
 
-      const total = Math.max(1, Math.ceil(totalItemCount / limit));
-      setTotalPages(total);
+      setTotalPages(Math.max(1, Math.ceil(totalItemCount / limit)));
 
       const formatted: CatCard[] = imageData.map((item) => ({
         id: item.breeds?.[0]?.id || item.id,
@@ -72,14 +72,14 @@ const MainBlock: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [query, currentPage, limit]);
+  }, [query, currentPage]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
   const handleSearch = (newQuery: string) => {
-    setQuery(newQuery.trim());
+    setQuery(newQuery);
     navigate(`/?page=1`);
   };
 
@@ -95,7 +95,7 @@ const MainBlock: React.FC = () => {
 
   return (
     <main className={s.main}>
-      <Header onSearch={handleSearch} />
+      <Header onSearch={handleSearch} defaultValue={query} />
 
       {error && (
         <div className={s.error} role="alert">

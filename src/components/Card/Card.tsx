@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import s from './Card.module.scss';
 
 interface CardProps {
@@ -9,15 +9,10 @@ interface CardProps {
 }
 
 const Card: React.FC<CardProps> = ({ id, title, imageUrl }) => {
-  const navigate = useNavigate();
   const validImage = imageUrl?.trim() || 'https://placekitten.com/300/200';
 
-  const handleClick = () => {
-    navigate(`/details/${id}`);
-  };
-
   return (
-    <div className={s.card} onClick={handleClick}>
+    <Link to={`/details/${id}`} className={s.card}>
       <img
         src={validImage}
         alt={title}
@@ -30,7 +25,7 @@ const Card: React.FC<CardProps> = ({ id, title, imageUrl }) => {
       <div className={s.content}>
         <h3 className={s.title}>{title}</h3>
       </div>
-    </div>
+    </Link>
   );
 };
 

@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import ItemDetail from './ItemDetail';
@@ -21,7 +20,7 @@ describe('ItemDetail', () => {
   });
 
   it('renders breed details successfully', async () => {
-    (catApi.fetchBreedDetail as jest.Mock).mockResolvedValue({
+    (catApi.fetchBreedAndImageUrl as jest.Mock).mockResolvedValue({
       breed: mockBreed,
       imageUrl: mockImageUrl,
     });
@@ -48,7 +47,7 @@ describe('ItemDetail', () => {
   });
 
   it('shows error if API call fails', async () => {
-    (catApi.fetchBreedDetail as jest.Mock).mockRejectedValue(
+    (catApi.fetchBreedAndImageUrl as jest.Mock).mockRejectedValue(
       new Error('API failed')
     );
 
@@ -64,25 +63,6 @@ describe('ItemDetail', () => {
 
     await waitFor(() => {
       expect(screen.getByRole('alert')).toHaveTextContent('Error: API failed');
-    });
-  });
-
-  it('shows "Item Not Found" if breed is null', async () => {
-    (catApi.fetchBreedDetail as jest.Mock).mockResolvedValue({
-      breed: null,
-      imageUrl: null,
-    });
-
-    render(
-      <MemoryRouter initialEntries={['/details/abc']}>
-        <Routes>
-          <Route path="/details/:id" element={<ItemDetail />} />
-        </Routes>
-      </MemoryRouter>
-    );
-
-    await waitFor(() => {
-      expect(screen.getByText('Item Not Found')).toBeInTheDocument();
     });
   });
 

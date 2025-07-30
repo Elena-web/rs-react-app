@@ -1,29 +1,33 @@
-import React from 'react';
-import useLocalStorage from '../../hooks/useLocalStorage';
+import React, { useState, useEffect } from 'react';
 import s from './Search.module.scss';
 
 interface SearchProps {
   onSearch: (searchTerm: string) => void;
+  defaultValue?: string;
 }
 
-const Search: React.FC<SearchProps> = ({ onSearch }) => {
-  const [searchTerm, setSearchTerm] = useLocalStorage<string>('searchTerm', '');
+const Search: React.FC<SearchProps> = ({ onSearch, defaultValue = '' }) => {
+  const [inputValue, setInputValue] = useState(defaultValue);
+
+  useEffect(() => {
+    setInputValue(defaultValue);
+  }, [defaultValue]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(event.target.value);
+    setInputValue(event.target.value);
   };
 
   const handleSearch = () => {
-    const trimmedTerm = searchTerm.trim();
-    setSearchTerm(trimmedTerm);
-    onSearch(trimmedTerm);
+    const trimmedValue = inputValue.trim();
+    onSearch(trimmedValue);
+    localStorage.setItem('searchTerm', JSON.stringify(trimmedValue));
   };
 
   return (
     <div className={s.search}>
       <input
         type="text"
-        value={searchTerm}
+        value={inputValue}
         onChange={handleInputChange}
         className={s.input}
         placeholder="Siberian"

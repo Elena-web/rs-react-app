@@ -1,4 +1,4 @@
-import avtor from '@/assets/avtor.jpeg';
+import authorPhoto from '@/assets/author.jpeg';
 import { Link } from 'react-router-dom';
 import s from './About.module.scss';
 
@@ -10,7 +10,7 @@ function About() {
 
         <div className={s.content}>
           <div className={s.img}>
-            <img src={avtor} alt="Elena Pavlovich" />
+            <img src={authorPhoto} alt="Elena Pavlovich" />
           </div>
           <div className="description">
             <h2>Elena Pavlovich</h2>

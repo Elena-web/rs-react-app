@@ -13,7 +13,7 @@ jest.mock('../Search/Search', () => ({
 describe('Header Component', () => {
   test('renders title and subtitles', () => {
     const mockOnSearch = jest.fn();
-    render(<Header onSearch={mockOnSearch} />);
+    render(<Header onSearch={mockOnSearch} defaultValue="" />);
 
     expect(
       screen.getByText(/Discover Your Perfect Breed/i)
@@ -27,7 +27,7 @@ describe('Header Component', () => {
 
   test('calls onSearch when Search component triggers it', async () => {
     const mockOnSearch = jest.fn();
-    render(<Header onSearch={mockOnSearch} />);
+    render(<Header onSearch={mockOnSearch} defaultValue="" />);
 
     const button = screen.getByText('Mock Search');
     await userEvent.click(button);

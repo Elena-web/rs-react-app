@@ -52,7 +52,7 @@ export async function fetchCatImages(
   return response.json();
 }
 
-export async function fetchBreedDetail(
+export async function fetchBreedAndImageUrl(
   id: string
 ): Promise<{ breed: BreedResponse; imageUrl: string | null }> {
   const breedsResponse = await fetch('https://api.thecatapi.com/v1/breeds', {

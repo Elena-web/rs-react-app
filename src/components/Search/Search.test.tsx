@@ -7,11 +7,9 @@ describe('Search component', () => {
     localStorage.clear();
   });
 
-  test('renders input with value from localStorage if present', () => {
-    localStorage.setItem('searchTerm', JSON.stringify('Bengal'));
-
+  test('renders input with value from defaultValue prop', () => {
     const mockOnSearch = jest.fn();
-    render(<Search onSearch={mockOnSearch} />);
+    render(<Search onSearch={mockOnSearch} defaultValue="Bengal" />);
 
     const input = screen.getByPlaceholderText('Siberian') as HTMLInputElement;
     expect(input.value).toBe('Bengal');
@@ -32,7 +30,7 @@ describe('Search component', () => {
     const mockOnSearch = jest.fn();
     render(<Search onSearch={mockOnSearch} />);
 
-    const input = screen.getByPlaceholderText('Siberian');
+    const input = screen.getByPlaceholderText('Siberian') as HTMLInputElement;
     const button = screen.getByRole('button', { name: /Search/i });
 
     await userEvent.clear(input);
