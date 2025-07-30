@@ -10,12 +10,6 @@ export interface ImageResponseItem {
   breeds: BreedResponse[];
 }
 
-export interface CatCard {
-  id: string;
-  imageUrl: string;
-  title: string;
-}
-
 const API_KEY =
   'live_HWgjjjcVbpz6zUvU4914UAN3W1P2RcEC32VWQ15aK0fjB71qqSUc7O4D5IccTj0b';
 
@@ -23,17 +17,13 @@ const headers = {
   'x-api-key': API_KEY,
 };
 
-const API_BASE = 'https://api.thecatapi.com/v1';
-
-const limit = 9;
-
 export async function fetchBreedsByQuery(
   query: string
 ): Promise<BreedResponse[]> {
   if (!query.trim()) return [];
 
   const response = await fetch(
-    `${API_BASE}/breeds/search?q=${encodeURIComponent(query)}`,
+    `https://api.thecatapi.com/v1/breeds/search?q=${encodeURIComponent(query)}`,
     { headers }
   );
 
@@ -51,7 +41,7 @@ export async function fetchCatImages(
 ): Promise<ImageResponseItem[]> {
   const breedParam = breedIds.length ? `&breed_ids=${breedIds.join(',')}` : '';
   const response = await fetch(
-    `${API_BASE}/images/search?limit=${limit}&page=${page}&order=DESC${breedParam}`,
+    `https://api.thecatapi.com/v1/images/search?limit=${limit}&page=${page}${breedParam}`,
     { headers }
   );
 
@@ -65,13 +55,16 @@ export async function fetchCatImages(
 export async function fetchBreedDetail(
   id: string
 ): Promise<{ breed: BreedResponse; imageUrl: string | null }> {
-  const response = await fetch(`${API_BASE}/breeds`, { headers });
+  const breedsResponse = await fetch('https://api.thecatapi.com/v1/breeds', {
+    headers,
+  });
 
-  if (!response.ok) {
+  if (!breedsResponse.ok) {
     throw new Error('Failed to fetch breeds list');
   }
 
-  const breeds: BreedResponse[] = await response.json();
+  const breeds: BreedResponse[] = await breedsResponse.json();
+
   const breed = breeds.find((b) => b.id === id);
 
   if (!breed) {
@@ -84,36 +77,19 @@ export async function fetchBreedDetail(
   return { breed, imageUrl };
 }
 
-export async function fetchCatCards(
-  query: string,
-  page: number
-): Promise<{ cards: CatCard[]; totalPages: number }> {
-  const trimmed = query.trim();
-  let breedIds: string[] = [];
-  let totalItemsEstimate = 500;
+export async function fetchTotalImageCount(
+  breedIds: string[]
+): Promise<number> {
+  const breedParam = breedIds.length ? `&breed_ids=${breedIds.join(',')}` : '';
+  const response = await fetch(
+    `https://api.thecatapi.com/v1/images/search?limit=1000&page=0${breedParam}`,
+    { headers }
+  );
 
-  if (trimmed) {
-    const breedData = await fetchBreedsByQuery(trimmed);
-    breedIds = breedData.map((breed) => breed.id);
-    totalItemsEstimate = breedIds.length * 50;
-
-    if (breedIds.length === 0) {
-      totalItemsEstimate = 0;
-    }
+  if (!response.ok) {
+    throw new Error('Failed to fetch image count');
   }
 
-  const images = await fetchCatImages(limit, page - 1, breedIds);
-
-  const cards: CatCard[] = images.map((item) => ({
-    id: item.breeds?.[0]?.id || item.id,
-    imageUrl: item.url,
-    title: item.breeds?.[0]?.name || 'Funny cat',
-  }));
-
-  const totalPages =
-    totalItemsEstimate > 0
-      ? Math.max(1, Math.ceil(totalItemsEstimate / limit))
-      : 1;
-
-  return { cards, totalPages };
+  const images = await response.json();
+  return images.length;
 }

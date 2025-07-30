@@ -1,41 +1,70 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Outlet, useMatch, useNavigate, useLocation } from 'react-router-dom';
-
 import useLocalStorage from '../../hooks/useLocalStorage';
-import Header from '../Header/Header';
 import CardList from '../CardList/CardList';
+import Header from '../Header/Header';
 import Pagination from '../Pagination/Pagination';
-
-import { fetchCatCards } from '../../api/catApi';
 import s from './MainBlock.module.scss';
 
-import type { CatCard } from '../../api/catApi';
+import {
+  fetchBreedsByQuery,
+  fetchCatImages,
+  fetchTotalImageCount,
+} from '../../api/catApi';
+
+interface CatCard {
+  id: string;
+  imageUrl: string;
+  title: string;
+}
 
 const MainBlock: React.FC = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  const searchParams = new URLSearchParams(location.search);
-  const pageParam = searchParams.get('page');
-  const currentPage = Math.max(parseInt(pageParam || '1', 10), 1);
-
-  const showDetail = useMatch('/details/:id');
-
-  const [query, setQuery] = useLocalStorage<string>('searchTerm', '');
   const [items, setItems] = useState<CatCard[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [fatalError, setFatalError] = useState(false);
+  const [query, setQuery] = useLocalStorage<string>('searchTerm', '');
   const [totalPages, setTotalPages] = useState(1);
+  const [fatalError, setFatalError] = useState(false);
+  const [limit] = useState(9);
+  const showDetail = useMatch('/details/:id');
+
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const currentPage = useMemo(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const pageParam = searchParams.get('page');
+    return Math.max(parseInt(pageParam || '1', 10), 1);
+  }, [location.search]);
 
   const fetchData = useCallback(async () => {
+    const trimmed = query.trim();
     setLoading(true);
     setError(null);
 
     try {
-      const { cards, totalPages } = await fetchCatCards(query, currentPage);
-      setItems(cards);
-      setTotalPages(totalPages);
+      let breedIds: string[] = [];
+
+      if (trimmed) {
+        const breedData = await fetchBreedsByQuery(trimmed);
+        breedIds = breedData.map((breed) => breed.id);
+      }
+
+      const [imageData, totalItemCount] = await Promise.all([
+        fetchCatImages(limit, currentPage - 1, breedIds),
+        fetchTotalImageCount(breedIds),
+      ]);
+
+      const total = Math.max(1, Math.ceil(totalItemCount / limit));
+      setTotalPages(total);
+
+      const formatted: CatCard[] = imageData.map((item) => ({
+        id: item.breeds?.[0]?.id || item.id,
+        imageUrl: item.url,
+        title: item.breeds?.[0]?.name || 'Funny cat',
+      }));
+
+      setItems(formatted);
     } catch (err) {
       const errorMessage = (err as Error).message || 'Failed to retrieve data.';
       console.error(errorMessage);
@@ -43,7 +72,7 @@ const MainBlock: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [query, currentPage]);
+  }, [query, currentPage, limit]);
 
   useEffect(() => {
     fetchData();
@@ -55,17 +84,9 @@ const MainBlock: React.FC = () => {
   };
 
   const handlePageChange = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      const params = new URLSearchParams(location.search);
-
-      if (page === 1) {
-        params.delete('page');
-      } else {
-        params.set('page', page.toString());
-      }
-
-      navigate({ pathname: location.pathname, search: params.toString() });
-    }
+    const params = new URLSearchParams(location.search);
+    params.set('page', page.toString());
+    navigate({ pathname: location.pathname, search: params.toString() });
   };
 
   if (fatalError) {
@@ -97,11 +118,13 @@ const MainBlock: React.FC = () => {
         )}
       </section>
 
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={handlePageChange}
-      />
+      {!loading && items.length > 0 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
+      )}
 
       <div className={s.errorButton}>
         <button onClick={() => setFatalError(true)} className={s.throwButton}>
