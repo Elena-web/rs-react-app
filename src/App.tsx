@@ -9,7 +9,7 @@ import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
 
 const App: React.FC = () => {
   return (
-    <Router basename="/rs-react-app">
+    <Router basename="/rs-react-app/">
       <Navigation />
       <ErrorBoundary>
         <Routes>

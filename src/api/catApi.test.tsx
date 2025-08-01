@@ -142,10 +142,15 @@ describe('catApi functions', () => {
 
   describe('fetchTotalImageCount', () => {
     it('returns correct count of images', async () => {
-      const mockImageItem: MockImage = { id: 'img', url: 'url', breeds: [] };
-      const mockImages: MockImage[] = new Array(50).fill(mockImageItem);
+      const mockImages: MockImage[] = new Array(50).fill({
+        id: 'img',
+        url: 'url',
+        breeds: [],
+      });
 
-      fetchMock.mockResponseOnce(JSON.stringify(mockImages));
+      fetchMock.mockResponseOnce(JSON.stringify(mockImages), {
+        headers: { 'pagination-count': '50' },
+      });
 
       const count = await fetchTotalImageCount(['abc', 'def']);
 

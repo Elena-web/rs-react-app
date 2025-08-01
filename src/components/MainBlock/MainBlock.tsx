@@ -80,7 +80,7 @@ const MainBlock: React.FC = () => {
 
   const handleSearch = (newQuery: string) => {
     setQuery(newQuery);
-    navigate(`/?page=1`);
+    navigate(`/rs-react-app/?page=1`);
   };
 
   const handlePageChange = (page: number) => {

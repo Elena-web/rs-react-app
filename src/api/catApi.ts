@@ -78,9 +78,10 @@ export async function fetchBreedAndImageUrl(
 }
 
 export async function fetchTotalImageCount(
-  breedIds: string[]
+  breedIds: string[] = []
 ): Promise<number> {
   const breedParam = breedIds.length ? `&breed_ids=${breedIds.join(',')}` : '';
+
   const response = await fetch(
     `https://api.thecatapi.com/v1/images/search?limit=1000&page=0${breedParam}`,
     { headers }
@@ -90,6 +91,13 @@ export async function fetchTotalImageCount(
     throw new Error('Failed to fetch image count');
   }
 
-  const images = await response.json();
-  return images.length;
+  const totalCount = response.headers.get('pagination-count');
+
+  if (!totalCount) {
+    return 0;
+  }
+
+  const parsedCount = parseInt(totalCount, 10);
+
+  return isNaN(parsedCount) ? 0 : parsedCount;
 }
