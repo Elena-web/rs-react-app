@@ -4,7 +4,7 @@ import s from './CardListSkeleton.module.scss';
 
 const CardListSkeleton: React.FC = () => {
   return (
-    <div className={s.wrapper} data-testid="loader">
+    <div className={s.wrapper} data-testid="card-skeleton">
       <CardSkeleton />
       <CardSkeleton />
       <CardSkeleton />

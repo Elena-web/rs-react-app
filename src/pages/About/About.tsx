@@ -1,4 +1,4 @@
-import authorPhoto from '@/assets/author.jpeg';
+import authorPhoto from '../../assets/author.jpeg';
 import { Link } from 'react-router-dom';
 import s from './About.module.scss';
 

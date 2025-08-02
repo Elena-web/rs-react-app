@@ -8,18 +8,22 @@ import s from './MainBlock.module.scss';
 
 import {
   fetchBreedsByQuery,
+  fetchAllBreeds,
   fetchCatImages,
   fetchTotalImageCount,
 } from '../../api/catApi';
+import type { BreedResponse } from '../../api/catApi';
 
 interface CatCard {
   id: string;
+  imageId: string;
   imageUrl: string;
   title: string;
 }
 
 const MainBlock: React.FC = () => {
   const [items, setItems] = useState<CatCard[]>([]);
+  const [cache, setCache] = useState<Record<number, CatCard[]>>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useLocalStorage<string>('searchTerm', '');
@@ -28,7 +32,6 @@ const MainBlock: React.FC = () => {
 
   const limit = 9;
   const showDetail = useMatch('/details/:id');
-
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -38,17 +41,21 @@ const MainBlock: React.FC = () => {
     return Math.max(parseInt(pageParam || '1', 10), 1);
   }, [location.search]);
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (): Promise<CatCard[]> => {
     const trimmed = query.trim();
     setLoading(true);
     setError(null);
 
     try {
       let breedIds: string[] = [];
+      let allBreeds: BreedResponse[] = [];
 
       if (trimmed) {
         const breedData = await fetchBreedsByQuery(trimmed);
         breedIds = breedData.map((breed) => breed.id);
+        allBreeds = breedData;
+      } else {
+        allBreeds = await fetchAllBreeds();
       }
 
       const [imageData, totalItemCount] = await Promise.all([
@@ -58,29 +65,52 @@ const MainBlock: React.FC = () => {
 
       setTotalPages(Math.max(1, Math.ceil(totalItemCount / limit)));
 
-      const formatted: CatCard[] = imageData.map((item) => ({
-        id: item.breeds?.[0]?.id || item.id,
-        imageUrl: item.url,
-        title: item.breeds?.[0]?.name || 'Funny cat',
-      }));
+      const formatted: CatCard[] = imageData.map((item) => {
+        if (item.breeds && item.breeds.length > 0) {
+          return {
+            id: item.id,
+            imageId: item.id,
+            imageUrl: item.url,
+            title: item.breeds[0].name,
+          };
+        }
 
-      setItems(formatted);
+        return {
+          id: item.id,
+          imageId: item.id,
+          imageUrl: item.url,
+          title: allBreeds.length > 0 ? allBreeds[0].name : 'Unknown cat',
+        };
+      });
+
+      return formatted;
     } catch (err) {
       const errorMessage = (err as Error).message || 'Failed to retrieve data.';
       console.error(errorMessage);
       setError(errorMessage);
+      return [];
     } finally {
       setLoading(false);
     }
   }, [query, currentPage]);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    const cachedItems = cache[currentPage];
+
+    if (cachedItems) {
+      setItems(cachedItems);
+    } else {
+      fetchData().then((data) => {
+        setItems(data);
+        setCache((prev) => ({ ...prev, [currentPage]: data }));
+      });
+    }
+  }, [currentPage, cache, fetchData]);
 
   const handleSearch = (newQuery: string) => {
     setQuery(newQuery);
-    navigate(`/rs-react-app/?page=1`);
+    setCache({});
+    navigate({ pathname: '/', search: '?page=1' });
   };
 
   const handlePageChange = (page: number) => {

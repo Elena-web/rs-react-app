@@ -57,10 +57,12 @@ describe('catApi functions', () => {
 
       const result = await fetchCatImages(5, 1, ['abc']);
 
-      expect(fetchMock).toHaveBeenCalledWith(
-        expect.stringContaining('limit=5&page=1&breed_ids=abc'),
-        expect.any(Object)
-      );
+      const calledUrl = fetchMock.mock.calls[0][0];
+
+      expect(calledUrl).toContain('limit=5');
+      expect(calledUrl).toContain('page=1');
+      expect(calledUrl).toContain('breed_ids=abc');
+
       expect(result).toEqual(mockImages);
     });
 

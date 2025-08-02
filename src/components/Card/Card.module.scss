@@ -1,3 +1,9 @@
+.cardWrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
 .card {
   background-color: $color-light-pink;
   border-radius: 10px 10px 16px 16px;
@@ -9,6 +15,7 @@
   display: flex;
   flex-direction: column;
   cursor: pointer;
+  position: relative;
 
   &:hover {
     transform: translateY(-4px);
@@ -42,4 +49,48 @@
   font-size: 0.98rem;
   color: $color-gray;
   line-height: 1.6;
+}
+
+.checkboxWrapper {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 2;
+
+  input[type='checkbox'] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid $color-pink;
+    border-radius: 4px;
+    background-color: white;
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:checked {
+      background-color: $color-pink;
+      border-color: $color-pink;
+    }
+
+    &:checked::after {
+      content: '';
+      width: 6px;
+      height: 10px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+      position: absolute;
+      left: 4px;
+      top: 0px;
+    }
+
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px rgba($color-pink, 0.4);
+    }
+  }
 }

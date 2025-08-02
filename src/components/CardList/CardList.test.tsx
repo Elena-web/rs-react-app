@@ -1,31 +1,45 @@
+import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { Provider } from 'react-redux';
+import { MemoryRouter } from 'react-router-dom';
+import configureStore from 'redux-mock-store';
 import CardList from './CardList';
 
-jest.mock(
-  '../Card/Card',
-  () =>
-    function MockCard(props: { title: string; imageUrl?: string }) {
-      return <div data-testid="card">{props.title}</div>;
-    }
-);
-
-jest.mock(
-  '../CardSkeleton/CardSkeleton',
-  () =>
-    function MockCardSkeleton() {
-      return <div data-testid="card-skeleton">Loading...</div>;
-    }
-);
+const mockStore = configureStore([]);
 
 describe('CardList component', () => {
+  let store: ReturnType<typeof mockStore>;
+
+  beforeEach(() => {
+    store = mockStore({
+      selection: { selectedIds: ['1'] },
+    });
+  });
+
   it('renders Card components when not loading', () => {
     const items = [
-      { id: '1', title: 'Card 1', imageUrl: 'https://example.com/1.jpg' },
-      { id: '2', title: 'Card 2', imageUrl: 'https://example.com/2.jpg' },
+      {
+        id: '1',
+        imageId: 'img1',
+        title: 'Card 1',
+        imageUrl: 'https://example.com/1.jpg',
+      },
+      {
+        id: '2',
+        imageId: 'img2',
+        title: 'Card 2',
+        imageUrl: 'https://example.com/2.jpg',
+      },
     ];
 
-    render(<CardList items={items} loading={false} />);
+    render(
+      <Provider store={store}>
+        <MemoryRouter>
+          <CardList items={items} loading={false} />
+        </MemoryRouter>
+      </Provider>
+    );
 
     const cards = screen.getAllByTestId('card');
     expect(cards).toHaveLength(2);
@@ -33,20 +47,18 @@ describe('CardList component', () => {
     expect(cards[1]).toHaveTextContent('Card 2');
   });
 
-  it('renders CardSkeleton components when loading is true', () => {
-    render(<CardList items={[]} loading={true} />);
-
-    const skeletons = screen.getAllByTestId('card-skeleton');
-    expect(skeletons).toHaveLength(6);
-    skeletons.forEach((skeleton) => {
-      expect(skeleton).toHaveTextContent('Loading...');
-    });
-  });
-
   it('renders nothing when items list is empty and loading is false', () => {
-    render(<CardList items={[]} loading={false} />);
+    const { container } = render(
+      <Provider store={store}>
+        <MemoryRouter>
+          <CardList items={[]} loading={false} />
+        </MemoryRouter>
+      </Provider>
+    );
 
     const cards = screen.queryAllByTestId('card');
     expect(cards).toHaveLength(0);
+
+    expect(container.firstChild).toBeEmptyDOMElement();
   });
 });

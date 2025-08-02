@@ -3,7 +3,7 @@ import s from './CardSkeleton.module.scss';
 
 const CardSkeleton: React.FC = () => {
   return (
-    <div className={`${s.card} ${s.skeleton}`}>
+    <div className={`${s.card} ${s.skeleton}`} data-testid="card-skeleton-item">
       <div className={s.imageSkeleton}></div>
       <div className={s.textSkeleton}></div>
       <div className={s.textSkeleton}></div>
