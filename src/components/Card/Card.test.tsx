@@ -5,6 +5,7 @@ import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import selectionReducer from '../../features/selectionSlice';
 import Card from './Card';
+import userEvent from '@testing-library/user-event';
 
 const store = configureStore({
   reducer: {
@@ -113,5 +114,37 @@ describe('Card component', () => {
 
     const img = screen.getByRole('img');
     expect(img).toHaveAttribute('src', 'https://placekitten.com/300/200');
+  });
+  it('checkbox reflects isSelected prop correctly', () => {
+    renderWithProviders(
+      <Card
+        id="6"
+        title="Checked Cat"
+        imageUrl="https://example.com/cat.jpg"
+        isSelected={true}
+        onToggleSelect={mockToggleSelect}
+      />
+    );
+
+    const checkbox = screen.getByRole('checkbox') as HTMLInputElement;
+    expect(checkbox.checked).toBe(true);
+  });
+
+  it('calls onToggleSelect with correct id when checkbox is clicked', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(
+      <Card
+        id="7"
+        title="Toggle Cat"
+        imageUrl="https://example.com/cat.jpg"
+        isSelected={false}
+        onToggleSelect={mockToggleSelect}
+      />
+    );
+
+    const checkbox = screen.getByRole('checkbox');
+    await user.click(checkbox);
+
+    expect(mockToggleSelect).toHaveBeenCalledWith('7');
   });
 });
