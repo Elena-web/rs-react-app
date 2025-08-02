@@ -4,7 +4,7 @@ import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
-  base: 'rs-react-app',
+  base: '/rs-react-app/',
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),
@@ -13,7 +13,7 @@ export default defineConfig({
   css: {
     preprocessorOptions: {
       scss: {
-        additionalData: `@import "@/styles/constants.scss";`,
+        additionalData: `@import "@/styles/base.scss";`,
       },
     },
   },

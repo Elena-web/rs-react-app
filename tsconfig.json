@@ -5,21 +5,17 @@
     { "path": "./tsconfig.node.json" }
   ],
   "compilerOptions": {
+    "outDir": "./dist",
     "moduleResolution": "node",
     "composite": true,
-    "noEmit": false,
     "esModuleInterop": true,
-    "jsx": "react",
+    "jsx": "react-jsx",
     "module": "esnext",
     "target": "es6",
     "strict": true,
-	"lib": ["DOM", "ESNext"],
+    "lib": ["DOM", "ESNext"],
     "types": ["jest", "node"]
   },
-  "include": [
-    "src/**/*",
-    "types/scss.d.ts",
-    "types/vite-env.d.ts",
-  ],
+  "include": ["src/types/scss.d.ts", "types/vite-env.d.ts"],
   "exclude": ["node_modules"]
 }

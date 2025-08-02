@@ -1,0 +1,16 @@
+@import './constants';
+@import './mixins';
+
+* {
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  background: linear-gradient(135deg, #1a1a2e, #28285f);
+}
+
+a {
+  text-decoration: none;
+  cursor: pointer;
+}

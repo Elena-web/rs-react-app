@@ -1,0 +1,85 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 3rem;
+  background-color: $color-light-pink;
+}
+
+.card {
+  font-family: $font-header-family;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem;
+  background: $color-white;
+  border-radius: 1.5rem;
+  box-shadow: 0 1.5rem 3rem rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.title {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  color: $color-dark-blue;
+}
+
+.content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.img {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+  }
+}
+
+.description {
+  h2 {
+    font-size: 1.8rem;
+  }
+}
+
+.link {
+  font-family: 'Allura', cursive;
+  font-size: 1.4rem;
+  font-weight: 400;
+  font-style: italic;
+  color: $color-dark-purple;
+
+  &:hover {
+    color: $color-pink;
+  }
+}
+
+.btn__back {
+  background-color: $color-light-pink;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  transition: $transition-all;
+  position: relative;
+  z-index: 1;
+  margin-top: 1.5rem;
+  font-family: $font-header-family;
+  font-weight: 500;
+  color: $color-pink;
+  @include pulse-animation;
+
+  &:hover {
+    text-shadow: none;
+    transform: translateY(-3px);
+  }
+}

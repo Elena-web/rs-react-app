@@ -1,11 +1,10 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import Header from './Header';
 
 jest.mock('../Search/Search', () => ({
-  __esModule: true, 
+  __esModule: true,
   default: ({ onSearch }: { onSearch: (term: string) => void }) => (
     <button onClick={() => onSearch('Maine Coon')}>Mock Search</button>
   ),
@@ -14,7 +13,7 @@ jest.mock('../Search/Search', () => ({
 describe('Header Component', () => {
   test('renders title and subtitles', () => {
     const mockOnSearch = jest.fn();
-    render(<Header onSearch={mockOnSearch} />);
+    render(<Header onSearch={mockOnSearch} defaultValue="" />);
 
     expect(
       screen.getByText(/Discover Your Perfect Breed/i)
@@ -28,7 +27,7 @@ describe('Header Component', () => {
 
   test('calls onSearch when Search component triggers it', async () => {
     const mockOnSearch = jest.fn();
-    render(<Header onSearch={mockOnSearch} />);
+    render(<Header onSearch={mockOnSearch} defaultValue="" />);
 
     const button = screen.getByText('Mock Search');
     await userEvent.click(button);

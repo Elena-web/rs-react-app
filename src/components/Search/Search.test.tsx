@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Search from './Search';
@@ -8,11 +7,9 @@ describe('Search component', () => {
     localStorage.clear();
   });
 
-  test('renders input with value from localStorage if present', () => {
-    localStorage.setItem('searchTerm', 'Bengal');
-
+  test('renders input with value from defaultValue prop', () => {
     const mockOnSearch = jest.fn();
-    render(<Search onSearch={mockOnSearch} />);
+    render(<Search onSearch={mockOnSearch} defaultValue="Bengal" />);
 
     const input = screen.getByPlaceholderText('Siberian') as HTMLInputElement;
     expect(input.value).toBe('Bengal');
@@ -33,7 +30,7 @@ describe('Search component', () => {
     const mockOnSearch = jest.fn();
     render(<Search onSearch={mockOnSearch} />);
 
-    const input = screen.getByPlaceholderText('Siberian');
+    const input = screen.getByPlaceholderText('Siberian') as HTMLInputElement;
     const button = screen.getByRole('button', { name: /Search/i });
 
     await userEvent.clear(input);
@@ -42,6 +39,9 @@ describe('Search component', () => {
 
     expect(mockOnSearch).toHaveBeenCalledWith('Maine Coon');
     expect(mockOnSearch).toHaveBeenCalledTimes(1);
-    expect(localStorage.getItem('searchTerm')).toBe('Maine Coon');
+
+    const stored = localStorage.getItem('searchTerm');
+    expect(stored).not.toBeNull();
+    expect(JSON.parse(stored ?? '')).toBe('Maine Coon');
   });
 });

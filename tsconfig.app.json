@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "outDir": "./dist/app",
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
     "target": "ES2022",
     "useDefineForClassFields": true,
@@ -13,16 +14,19 @@
     "allowImportingTsExtensions": false,
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
-    "noEmit": false,
     "jsx": "react-jsx",
+
+    /* Emit output to dist/app */
+    "declaration": true,
+    "declarationMap": true,
+    "emitDeclarationOnly": false,
 
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src/**/*"]
+  "include": ["src", "types/scss.d.ts"]
 }

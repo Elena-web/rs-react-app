@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import CardList from './CardList';
@@ -22,8 +21,8 @@ jest.mock(
 describe('CardList component', () => {
   it('renders Card components when not loading', () => {
     const items = [
-      { title: 'Card 1', imageUrl: 'https://example.com/1.jpg' },
-      { title: 'Card 2', imageUrl: 'https://example.com/2.jpg' },
+      { id: '1', title: 'Card 1', imageUrl: 'https://example.com/1.jpg' },
+      { id: '2', title: 'Card 2', imageUrl: 'https://example.com/2.jpg' },
     ];
 
     render(<CardList items={items} loading={false} />);

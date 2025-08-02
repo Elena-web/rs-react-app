@@ -23,40 +23,6 @@
   min-height: 300px;
 }
 
-.pagination {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin-top: 2rem;
-}
-
-.pageButton {
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
-  background-color: $color-pagination-bg;
-  border-radius: 8px;
-  transition: background-color 0.2s ease;
-  cursor: pointer;
-
-  &:hover {
-    background-color: $color-pagination-hover;
-  }
-
-  &:disabled {
-    background-color: $color-pagination-disabled;
-    cursor: not-allowed;
-  }
-}
-
-.pageNext {
-  background-color: $color-pagination-active;
-  color: $color-white;
-
-  &:hover {
-    background-color: $color-info;
-  }
-}
-
 .throwButton {
   background-color: $color-throw-bg;
   color: $color-white;
@@ -69,4 +35,23 @@
   &:hover {
     background-color: $color-throw-hover;
   }
+}
+
+.results {
+  margin-top: 24px;
+}
+
+.split {
+  display: flex;
+  gap: 24px;
+}
+
+.list {
+  flex: 1;
+}
+
+.detail {
+  flex: 1;
+  max-width: 30%;
+  padding-left: 16px;
 }

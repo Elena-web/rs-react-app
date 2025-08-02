@@ -1,4 +1,18 @@
-export const mockImageResponse = [
+export interface MockBreed {
+  id: string;
+  name: string;
+  temperament?: string;
+  origin?: string;
+  description?: string;
+}
+
+export interface MockImage {
+  id: string;
+  url: string;
+  breeds: { id: string; name: string }[];
+}
+
+export const mockImageResponse: MockImage[] = [
   {
     id: 'abys_image',
     url: 'https://cdn.example.com/abys.jpg',
@@ -6,7 +20,7 @@ export const mockImageResponse = [
   },
 ];
 
-export const mockBreedResponse = [
+export const mockBreedResponse: MockBreed[] = [
   {
     id: 'abys',
     name: 'Abyssinian',

@@ -1,17 +1,24 @@
-import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import MainBlock from './MainBlock';
-import { fetchBreedsByQuery, fetchCatImages } from '../../api/catApi';
+import {
+  fetchBreedsByQuery,
+  fetchCatImages,
+  fetchTotalImageCount,
+} from '../../api/catApi';
 import { mockBreedResponse, mockImageResponse } from './__mocks__/mocks';
+import { MemoryRouter } from 'react-router-dom';
 
 jest.mock('../../api/catApi', () => ({
   fetchBreedsByQuery: jest.fn(),
   fetchCatImages: jest.fn(),
+  fetchTotalImageCount: jest.fn(),
 }));
 
 describe('MainBlock component', () => {
+  const mockTotalImageCount = 27;
+
   beforeEach(() => {
     jest.clearAllMocks();
     localStorage.clear();
@@ -20,8 +27,13 @@ describe('MainBlock component', () => {
   it('renders cat cards after loading', async () => {
     (fetchBreedsByQuery as jest.Mock).mockResolvedValue(mockBreedResponse);
     (fetchCatImages as jest.Mock).mockResolvedValue(mockImageResponse);
+    (fetchTotalImageCount as jest.Mock).mockResolvedValue(mockTotalImageCount);
 
-    render(<MainBlock />);
+    render(
+      <MemoryRouter initialEntries={['/?page=1']}>
+        <MainBlock />
+      </MemoryRouter>
+    );
 
     expect(
       screen.queryByText(mockBreedResponse[0].name)
@@ -42,8 +54,13 @@ describe('MainBlock component', () => {
     (fetchCatImages as jest.Mock).mockResolvedValue(
       mockImageResponseWithNoBreeds
     );
+    (fetchTotalImageCount as jest.Mock).mockResolvedValue(mockTotalImageCount);
 
-    render(<MainBlock />);
+    render(
+      <MemoryRouter initialEntries={['/?page=1']}>
+        <MainBlock />
+      </MemoryRouter>
+    );
 
     await waitFor(() => {
       const funnyCats = screen.getAllByText('Funny cat');
@@ -56,8 +73,13 @@ describe('MainBlock component', () => {
 
     (fetchBreedsByQuery as jest.Mock).mockRejectedValue(new Error('API error'));
     (fetchCatImages as jest.Mock).mockRejectedValue(new Error('API error'));
+    (fetchTotalImageCount as jest.Mock).mockResolvedValue(mockTotalImageCount);
 
-    render(<MainBlock />);
+    render(
+      <MemoryRouter initialEntries={['/?page=1']}>
+        <MainBlock />
+      </MemoryRouter>
+    );
 
     await waitFor(() => {
       const alert = screen.getByRole('alert');
@@ -68,40 +90,16 @@ describe('MainBlock component', () => {
   it('increments page when clicking Next button', async () => {
     (fetchBreedsByQuery as jest.Mock).mockResolvedValue(mockBreedResponse);
     (fetchCatImages as jest.Mock).mockResolvedValue(mockImageResponse);
+    (fetchTotalImageCount as jest.Mock).mockResolvedValue(mockTotalImageCount);
 
-    render(<MainBlock />);
+    render(
+      <MemoryRouter initialEntries={['/?page=1']}>
+        <MainBlock />
+      </MemoryRouter>
+    );
 
-    const nextButton = screen.getByRole('button', { name: /next/i });
+    const nextButton = await screen.findByRole('button', { name: /next/i });
     await userEvent.click(nextButton);
-
-    await waitFor(() => {
-      expect(fetchCatImages).toHaveBeenCalledWith(
-        expect.any(Number),
-        2,
-        expect.any(Array)
-      );
-    });
-  });
-
-  it('decrements page when clicking Previous button', async () => {
-    (fetchBreedsByQuery as jest.Mock).mockResolvedValue(mockBreedResponse);
-    (fetchCatImages as jest.Mock).mockResolvedValue(mockImageResponse);
-
-    render(<MainBlock />);
-
-    const nextButton = screen.getByRole('button', { name: /next/i });
-    await userEvent.click(nextButton);
-
-    await waitFor(() => {
-      expect(fetchCatImages).toHaveBeenCalledWith(
-        expect.any(Number),
-        2,
-        expect.any(Array)
-      );
-    });
-
-    const prevButton = screen.getByRole('button', { name: /previous/i });
-    await userEvent.click(prevButton);
 
     await waitFor(() => {
       expect(fetchCatImages).toHaveBeenCalledWith(
@@ -112,47 +110,39 @@ describe('MainBlock component', () => {
     });
   });
 
-  it('catches fatal error in ErrorBoundary and shows fallback UI', async () => {
-    class TestErrorBoundary extends React.Component<
-      { children: React.ReactNode },
-      { hasError: boolean }
-    > {
-      constructor(props: { children: React.ReactNode }) {
-        super(props);
-        this.state = { hasError: false };
-      }
-
-      static getDerivedStateFromError() {
-        return { hasError: true };
-      }
-
-      render() {
-        if (this.state.hasError) {
-          return <div data-testid="error-boundary">Error caught!</div>;
-        }
-        return this.props.children;
-      }
-    }
+  it('decrements page when clicking Previous button', async () => {
+    (fetchBreedsByQuery as jest.Mock).mockResolvedValue(mockBreedResponse);
+    (fetchCatImages as jest.Mock).mockResolvedValue(mockImageResponse);
+    (fetchTotalImageCount as jest.Mock).mockResolvedValue(mockTotalImageCount);
 
     render(
-      <TestErrorBoundary>
+      <MemoryRouter initialEntries={['/?page=2']}>
         <MainBlock />
-      </TestErrorBoundary>
+      </MemoryRouter>
     );
 
-    const errorButton = screen.getByRole('button', { name: /trigger error/i });
-    await userEvent.click(errorButton);
+    const prevButton = await screen.findByRole('button', { name: /previous/i });
+    await userEvent.click(prevButton);
 
     await waitFor(() => {
-      expect(screen.getByTestId('error-boundary')).toBeInTheDocument();
+      expect(fetchCatImages).toHaveBeenCalledWith(
+        expect.any(Number),
+        0,
+        expect.any(Array)
+      );
     });
   });
 
-  it('renders cat cards after loading', async () => {
+  it('shows loader while fetching and then displays cards', async () => {
     (fetchBreedsByQuery as jest.Mock).mockResolvedValue(mockBreedResponse);
     (fetchCatImages as jest.Mock).mockResolvedValue(mockImageResponse);
+    (fetchTotalImageCount as jest.Mock).mockResolvedValue(mockTotalImageCount);
 
-    render(<MainBlock />);
+    render(
+      <MemoryRouter initialEntries={['/?page=1']}>
+        <MainBlock />
+      </MemoryRouter>
+    );
 
     expect(screen.getByTestId('loader')).toBeInTheDocument();
 

@@ -26,7 +26,11 @@ export async function fetchBreedsByQuery(
     `https://api.thecatapi.com/v1/breeds/search?q=${encodeURIComponent(query)}`,
     { headers }
   );
-  if (!response.ok) throw new Error('Failed to fetch breeds');
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch breeds');
+  }
+
   return response.json();
 }
 
@@ -40,6 +44,60 @@ export async function fetchCatImages(
     `https://api.thecatapi.com/v1/images/search?limit=${limit}&page=${page}${breedParam}`,
     { headers }
   );
-  if (!response.ok) throw new Error('Failed to fetch images');
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch images');
+  }
+
   return response.json();
+}
+
+export async function fetchBreedAndImageUrl(
+  id: string
+): Promise<{ breed: BreedResponse; imageUrl: string | null }> {
+  const breedsResponse = await fetch('https://api.thecatapi.com/v1/breeds', {
+    headers,
+  });
+
+  if (!breedsResponse.ok) {
+    throw new Error('Failed to fetch breeds list');
+  }
+
+  const breeds: BreedResponse[] = await breedsResponse.json();
+
+  const breed = breeds.find((b) => b.id === id);
+
+  if (!breed) {
+    throw new Error(`Breed with id "${id}" not found`);
+  }
+
+  const images = await fetchCatImages(1, 0, [id]);
+  const imageUrl = images.length > 0 ? images[0].url : null;
+
+  return { breed, imageUrl };
+}
+
+export async function fetchTotalImageCount(
+  breedIds: string[] = []
+): Promise<number> {
+  const breedParam = breedIds.length ? `&breed_ids=${breedIds.join(',')}` : '';
+
+  const response = await fetch(
+    `https://api.thecatapi.com/v1/images/search?limit=1000&page=0${breedParam}`,
+    { headers }
+  );
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch image count');
+  }
+
+  const totalCount = response.headers.get('pagination-count');
+
+  if (!totalCount) {
+    return 0;
+  }
+
+  const parsedCount = parseInt(totalCount, 10);
+
+  return isNaN(parsedCount) ? 0 : parsedCount;
 }
