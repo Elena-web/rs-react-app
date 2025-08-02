@@ -35,7 +35,8 @@ const MainBlock: React.FC = () => {
   const [query, setQuery] = useLocalStorage<string>('searchTerm', '');
   const [totalPages, setTotalPages] = useState(1);
   const [fatalError, setFatalError] = useState(false);
-
+  const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+  const [downloadFilename, setDownloadFilename] = useState<string>('');
   const dispatch = useAppDispatch();
   const selectedIds = useAppSelector((state) => state.selection.selectedIds);
 
@@ -77,23 +78,17 @@ const MainBlock: React.FC = () => {
 
       setTotalPages(Math.max(1, Math.ceil(totalItemCount / limit)));
 
-      const formatted: CatCard[] = imageData.map((item) => {
+      return imageData.map((item) => {
         const breed = item.breeds?.[0];
-        const title = breed?.name || 'Unknown cat';
-        const description = breed?.description || 'No description';
-        const detailsUrl = `${window.location.origin}/details/${item.id}`;
-
         return {
           id: item.id,
           imageId: item.id,
           imageUrl: item.url,
-          title,
-          description,
-          detailsUrl,
+          title: breed?.name || 'Unknown cat',
+          description: breed?.description || 'No description',
+          detailsUrl: `${window.location.origin}/details/${item.id}`,
         };
       });
-
-      return formatted;
     } catch (err) {
       const errorMessage = (err as Error).message || 'Failed to retrieve data.';
       console.error(errorMessage);
@@ -150,14 +145,25 @@ const MainBlock: React.FC = () => {
       .join('\n');
 
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const filename = `${selectedItems.length}_cat_breeds.csv`;
-    link.href = URL.createObjectURL(blob);
-    link.setAttribute('download', filename);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const url = URL.createObjectURL(blob);
+
+    setDownloadFilename(`${selectedItems.length}_cat_breeds.csv`);
+    setDownloadUrl(url);
   };
+
+  useEffect(() => {
+    if (downloadUrl) {
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = downloadFilename;
+      link.click();
+
+      return () => {
+        URL.revokeObjectURL(downloadUrl);
+        setDownloadUrl(null);
+      };
+    }
+  }, [downloadUrl, downloadFilename]);
 
   if (fatalError) {
     throw new Error('Simulated error caught by ErrorBoundary');
@@ -213,7 +219,6 @@ const MainBlock: React.FC = () => {
           onDownload={handleDownload}
         />
       )}
-
       <div className={s.errorButton}>
         <button onClick={() => setFatalError(true)} className={s.throwButton}>
           Trigger error

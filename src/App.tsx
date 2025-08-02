@@ -6,10 +6,10 @@ import ItemDetail from './components/ItemDetail/ItemDetail';
 import About from './pages/About/About';
 import NotFound from './pages/NotFound/NotFound';
 import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
-import { useAppSelector } from './hooks/reduxHooks';
+import { useTheme } from './context/ThemeContext';
 
 const App: React.FC = () => {
-  const theme = useAppSelector((state) => state.theme.mode);
+  const { theme } = useTheme();
 
   useEffect(() => {
     document.body.setAttribute('data-theme', theme);
