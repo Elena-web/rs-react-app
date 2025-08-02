@@ -1,7 +1,5 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useAppDispatch } from '../../hooks/reduxHooks';
-import { toggleSelection } from '../../features/selectionSlice';
 import s from './Card.module.scss';
 
 interface CardProps {
@@ -9,16 +7,21 @@ interface CardProps {
   title: string;
   imageUrl?: string | null;
   isSelected: boolean;
+  onToggleSelect: (id: string) => void;
 }
 
-const Card: React.FC<CardProps> = ({ id, title, imageUrl, isSelected }) => {
-  const dispatch = useAppDispatch();
-
+const Card: React.FC<CardProps> = ({
+  id,
+  title,
+  imageUrl,
+  isSelected,
+  onToggleSelect,
+}) => {
   const validImage = imageUrl?.trim() || 'https://placekitten.com/300/200';
 
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.stopPropagation();
-    dispatch(toggleSelection(id));
+    onToggleSelect(id);
   };
 
   return (

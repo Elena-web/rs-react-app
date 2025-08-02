@@ -13,6 +13,8 @@ const store = configureStore({
 });
 
 describe('Card component', () => {
+  const mockToggleSelect = jest.fn();
+
   const renderWithProviders = (ui: React.ReactElement) => {
     return render(
       <Provider store={store}>
@@ -27,7 +29,13 @@ describe('Card component', () => {
     const imageUrl = 'https://example.com/cat.jpg';
 
     renderWithProviders(
-      <Card id={id} title={title} imageUrl={imageUrl} isSelected={false} />
+      <Card
+        id={id}
+        title={title}
+        imageUrl={imageUrl}
+        isSelected={false}
+        onToggleSelect={mockToggleSelect}
+      />
     );
 
     const img = screen.getByRole('img');
@@ -40,7 +48,14 @@ describe('Card component', () => {
     const id = '2';
     const title = 'Fallback Cat';
 
-    renderWithProviders(<Card id={id} title={title} isSelected={false} />);
+    renderWithProviders(
+      <Card
+        id={id}
+        title={title}
+        isSelected={false}
+        onToggleSelect={mockToggleSelect}
+      />
+    );
 
     const img = screen.getByRole('img');
     expect(img).toHaveAttribute('src', 'https://placekitten.com/300/200');
@@ -51,7 +66,13 @@ describe('Card component', () => {
     const title = 'Empty URL Cat';
 
     renderWithProviders(
-      <Card id={id} title={title} imageUrl="   " isSelected={false} />
+      <Card
+        id={id}
+        title={title}
+        imageUrl="   "
+        isSelected={false}
+        onToggleSelect={mockToggleSelect}
+      />
     );
 
     const img = screen.getByRole('img');
@@ -63,7 +84,13 @@ describe('Card component', () => {
     const title = 'Null URL Cat';
 
     renderWithProviders(
-      <Card id={id} title={title} imageUrl={null} isSelected={false} />
+      <Card
+        id={id}
+        title={title}
+        imageUrl={null}
+        isSelected={false}
+        onToggleSelect={mockToggleSelect}
+      />
     );
 
     const img = screen.getByRole('img');
@@ -75,7 +102,13 @@ describe('Card component', () => {
     const title = 'Undefined URL Cat';
 
     renderWithProviders(
-      <Card id={id} title={title} imageUrl={undefined} isSelected={false} />
+      <Card
+        id={id}
+        title={title}
+        imageUrl={undefined}
+        isSelected={false}
+        onToggleSelect={mockToggleSelect}
+      />
     );
 
     const img = screen.getByRole('img');

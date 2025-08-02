@@ -1,7 +1,6 @@
 import React from 'react';
 import Card from '../Card/Card';
 import CardListSkeleton from '../CardListSkeleton/CardListSkeleton';
-import { useAppSelector } from '../../hooks/reduxHooks';
 import s from './CardList.module.scss';
 
 interface CardItem {
@@ -14,11 +13,16 @@ interface CardItem {
 interface CardListProps {
   items: CardItem[];
   loading?: boolean;
+  selectedIds: string[];
+  onToggleSelect: (id: string) => void;
 }
 
-const CardList: React.FC<CardListProps> = ({ items, loading = false }) => {
-  const selectedIds = useAppSelector((state) => state.selection.selectedIds);
-
+const CardList: React.FC<CardListProps> = ({
+  items,
+  loading = false,
+  selectedIds,
+  onToggleSelect,
+}) => {
   if (loading) {
     return <CardListSkeleton />;
   }
@@ -32,10 +36,11 @@ const CardList: React.FC<CardListProps> = ({ items, loading = false }) => {
           title={title}
           imageUrl={imageUrl}
           isSelected={selectedIds.includes(id)}
-          data-testid="card"
+          onToggleSelect={() => onToggleSelect(id)}
         />
       ))}
     </div>
   );
 };
+
 export default CardList;

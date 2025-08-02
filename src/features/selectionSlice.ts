@@ -1,5 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
-import type { PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
 export interface SelectionState {
   selectedIds: string[];
@@ -21,8 +20,11 @@ const selectionSlice = createSlice({
         state.selectedIds.push(id);
       }
     },
+    clearSelection(state) {
+      state.selectedIds = [];
+    },
   },
 });
 
-export const { toggleSelection } = selectionSlice.actions;
+export const { toggleSelection, clearSelection } = selectionSlice.actions;
 export default selectionSlice.reducer;

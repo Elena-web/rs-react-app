@@ -11,9 +11,12 @@ const mockStore = configureStore([]);
 describe('CardList component', () => {
   let store: ReturnType<typeof mockStore>;
 
+  const mockToggleSelect = jest.fn();
+  const selectedIds = ['1'];
+
   beforeEach(() => {
     store = mockStore({
-      selection: { selectedIds: ['1'] },
+      selection: { selectedIds },
     });
   });
 
@@ -36,7 +39,12 @@ describe('CardList component', () => {
     render(
       <Provider store={store}>
         <MemoryRouter>
-          <CardList items={items} loading={false} />
+          <CardList
+            items={items}
+            loading={false}
+            selectedIds={selectedIds}
+            onToggleSelect={mockToggleSelect}
+          />
         </MemoryRouter>
       </Provider>
     );
@@ -51,14 +59,18 @@ describe('CardList component', () => {
     const { container } = render(
       <Provider store={store}>
         <MemoryRouter>
-          <CardList items={[]} loading={false} />
+          <CardList
+            items={[]}
+            loading={false}
+            selectedIds={selectedIds}
+            onToggleSelect={mockToggleSelect}
+          />
         </MemoryRouter>
       </Provider>
     );
 
     const cards = screen.queryAllByTestId('card');
     expect(cards).toHaveLength(0);
-
     expect(container.firstChild).toBeEmptyDOMElement();
   });
 });

@@ -4,6 +4,7 @@ import useLocalStorage from '../../hooks/useLocalStorage';
 import CardList from '../CardList/CardList';
 import Header from '../Header/Header';
 import Pagination from '../Pagination/Pagination';
+import SelectionBlock from '../SelectionBlock/SelectionBlock';
 import s from './MainBlock.module.scss';
 
 import {
@@ -14,11 +15,16 @@ import {
 } from '../../api/catApi';
 import type { BreedResponse } from '../../api/catApi';
 
+import { useAppSelector, useAppDispatch } from '../../hooks/reduxHooks';
+import { clearSelection, toggleSelection } from '../../features/selectionSlice';
+
 interface CatCard {
   id: string;
   imageId: string;
   imageUrl: string;
   title: string;
+  description?: string;
+  detailsUrl: string;
 }
 
 const MainBlock: React.FC = () => {
@@ -29,6 +35,9 @@ const MainBlock: React.FC = () => {
   const [query, setQuery] = useLocalStorage<string>('searchTerm', '');
   const [totalPages, setTotalPages] = useState(1);
   const [fatalError, setFatalError] = useState(false);
+
+  const dispatch = useAppDispatch();
+  const selectedIds = useAppSelector((state) => state.selection.selectedIds);
 
   const limit = 9;
   const showDetail = useMatch('/details/:id');
@@ -47,15 +56,18 @@ const MainBlock: React.FC = () => {
     setError(null);
 
     try {
-      let breedIds: string[] = [];
-      let allBreeds: BreedResponse[] = [];
+      const breedIds: string[] = [];
+      const breedsMap: Map<string, BreedResponse> = new Map();
 
       if (trimmed) {
         const breedData = await fetchBreedsByQuery(trimmed);
-        breedIds = breedData.map((breed) => breed.id);
-        allBreeds = breedData;
+        breedData.forEach((breed) => {
+          breedIds.push(breed.id);
+          breedsMap.set(breed.id, breed);
+        });
       } else {
-        allBreeds = await fetchAllBreeds();
+        const allBreeds = await fetchAllBreeds();
+        allBreeds.forEach((breed) => breedsMap.set(breed.id, breed));
       }
 
       const [imageData, totalItemCount] = await Promise.all([
@@ -66,20 +78,18 @@ const MainBlock: React.FC = () => {
       setTotalPages(Math.max(1, Math.ceil(totalItemCount / limit)));
 
       const formatted: CatCard[] = imageData.map((item) => {
-        if (item.breeds && item.breeds.length > 0) {
-          return {
-            id: item.id,
-            imageId: item.id,
-            imageUrl: item.url,
-            title: item.breeds[0].name,
-          };
-        }
+        const breed = item.breeds?.[0];
+        const title = breed?.name || 'Unknown cat';
+        const description = breed?.description || 'No description';
+        const detailsUrl = `${window.location.origin}/details/${item.id}`;
 
         return {
           id: item.id,
           imageId: item.id,
           imageUrl: item.url,
-          title: allBreeds.length > 0 ? allBreeds[0].name : 'Unknown cat',
+          title,
+          description,
+          detailsUrl,
         };
       });
 
@@ -119,6 +129,36 @@ const MainBlock: React.FC = () => {
     navigate({ pathname: location.pathname, search: params.toString() });
   };
 
+  const toggleSelect = (id: string) => {
+    dispatch(toggleSelection(id));
+  };
+
+  const handleClearSelection = () => {
+    dispatch(clearSelection());
+  };
+
+  const handleDownload = () => {
+    const selectedItems = items.filter((item) => selectedIds.includes(item.id));
+
+    const csvContent = [
+      ['Title', 'Description'],
+      ...selectedItems.map((item) => [item.title, item.description || '']),
+    ]
+      .map((row) =>
+        row.map((field) => `"${String(field).replace(/"/g, '""')}"`).join(',')
+      )
+      .join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const filename = `${selectedItems.length}_cat_breeds.csv`;
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute('download', filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   if (fatalError) {
     throw new Error('Simulated error caught by ErrorBoundary');
   }
@@ -137,14 +177,24 @@ const MainBlock: React.FC = () => {
         {showDetail ? (
           <div className={s.split}>
             <div className={s.list}>
-              <CardList items={items} loading={loading} />
+              <CardList
+                items={items}
+                loading={loading}
+                selectedIds={selectedIds}
+                onToggleSelect={toggleSelect}
+              />
             </div>
             <div className={s.detail}>
               <Outlet />
             </div>
           </div>
         ) : (
-          <CardList items={items} loading={loading} />
+          <CardList
+            items={items}
+            loading={loading}
+            selectedIds={selectedIds}
+            onToggleSelect={toggleSelect}
+          />
         )}
       </section>
 
@@ -153,6 +203,14 @@ const MainBlock: React.FC = () => {
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={handlePageChange}
+        />
+      )}
+
+      {selectedIds.length > 0 && (
+        <SelectionBlock
+          selectedCount={selectedIds.length}
+          onClear={handleClearSelection}
+          onDownload={handleDownload}
         />
       )}
 
