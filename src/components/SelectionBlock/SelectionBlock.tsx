@@ -1,5 +1,5 @@
 import React from 'react';
-import s from './SelectionBar.module.scss';
+import s from './SelectionBlock.module.scss';
 
 interface SelectionBarProps {
   selectedCount: number;

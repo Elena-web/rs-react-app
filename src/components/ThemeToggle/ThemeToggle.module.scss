@@ -1,0 +1,19 @@
+.button {
+  background-color: $color-dark-purple;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  transition: $transition-all;
+  position: relative;
+  z-index: 1;
+  font-family: $font-header-family;
+  font-weight: 500;
+  color: $color-white;
+  @include pulse-animation;
+
+  &:hover {
+    color: $color-pink;
+    text-shadow: none;
+  }
+}

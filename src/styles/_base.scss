@@ -7,6 +7,10 @@
 }
 
 body {
+  background: linear-gradient(135deg, #e7e7ef, #28285f);
+}
+
+body[data-theme='dark'] {
   background: linear-gradient(135deg, #1a1a2e, #28285f);
 }
 

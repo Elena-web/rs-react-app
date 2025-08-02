@@ -1,5 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import pawIcon from '../../assets/icon-paw.png';
+import ThemeToggle from '../ThemeToggle/ThemeToggle';
+
 import s from './Navigation.module.scss';
 
 const Navigation = () => {
@@ -16,6 +18,7 @@ const Navigation = () => {
         <NavLink to="/about" className={s.link}>
           About
         </NavLink>
+        <ThemeToggle />
       </div>
     </nav>
   );
