@@ -133,7 +133,11 @@ const MainBlock: React.FC = () => {
   };
 
   const handleDownload = () => {
-    const selectedItems = items.filter((item) => selectedIds.includes(item.id));
+    const allCachedItems = Object.values(cache).flat();
+
+    const selectedItems = allCachedItems.filter((item) =>
+      selectedIds.includes(item.id)
+    );
 
     const csvContent = [
       ['Title', 'Description'],
