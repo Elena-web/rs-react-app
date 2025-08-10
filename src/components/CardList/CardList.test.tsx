@@ -26,12 +26,14 @@ describe('CardList component', () => {
         imageId: 'img1',
         title: 'Card 1',
         imageUrl: 'https://example.com/1.jpg',
+        detailsUrl: 'https://example.com/details/1',
       },
       {
         id: '2',
         imageId: 'img2',
         title: 'Card 2',
         imageUrl: 'https://example.com/2.jpg',
+        detailsUrl: 'https://example.com/details/2',
       },
     ];
 

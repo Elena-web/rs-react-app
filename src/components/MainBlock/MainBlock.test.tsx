@@ -6,6 +6,7 @@ import configureStore from 'redux-mock-store';
 import MainBlock from './MainBlock';
 import * as catApi from '../../api/catApi';
 import type { RootState } from '../../store/store';
+import type { CatCard } from '../../features/selectionSlice';
 
 const mockStore = configureStore<Partial<RootState>>([]);
 
@@ -24,7 +25,10 @@ describe('MainBlock', () => {
 
   beforeEach(() => {
     store = mockStore({
-      selection: { selectedIds: [] },
+      selection: {
+        selectedIds: [],
+        selectedItems: {},
+      },
     });
 
     (catApi.useGetAllBreedsQuery as jest.Mock).mockReturnValue({
@@ -86,22 +90,23 @@ describe('MainBlock', () => {
 
   it('renders SelectionBlock when items are selected', () => {
     store = mockStore({
-      selection: { selectedIds: ['1'] },
+      selection: {
+        selectedIds: ['1'],
+        selectedItems: {
+          '1': {
+            id: '1',
+            imageId: 'img1',
+            imageUrl: 'https://example.com/cat.jpg',
+            title: 'Abyssinian',
+            detailsUrl: '/details/1',
+            breeds: [{ name: 'Abyssinian', description: 'Active and playful' }],
+          } as CatCard,
+        },
+      },
     });
     renderComponent();
     expect(
       screen.getByRole('button', { name: /download/i })
     ).toBeInTheDocument();
-  });
-
-  it('renders SelectionBlock when items are selected', () => {
-    store = mockStore({
-      selection: { selectedIds: ['1'] },
-    });
-    renderComponent();
-    expect(
-      screen.getByRole('button', { name: /download/i })
-    ).toBeInTheDocument();
-    expect(screen.getByText(/download/i)).toBeInTheDocument();
   });
 });

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { Outlet, useMatch, useNavigate, useLocation } from 'react-router-dom';
 import useLocalStorage from '../../hooks/useLocalStorage';
 import CardList from '../CardList/CardList';
@@ -31,7 +31,11 @@ const ITEMS_PER_PAGE = 9;
 const MainBlock: React.FC = () => {
   const [query, setQuery] = useLocalStorage<string>('searchTerm', '');
   const dispatch = useAppDispatch();
+
   const selectedIds = useAppSelector((state) => state.selection.selectedIds);
+  const selectedItemsMap = useAppSelector(
+    (state) => state.selection.selectedItems
+  );
 
   const showDetail = useMatch('/details/:id');
   const location = useLocation();
@@ -106,16 +110,21 @@ const MainBlock: React.FC = () => {
     navigate({ pathname: location.pathname, search: params.toString() });
   };
 
-  const toggleSelect = (id: string) => {
-    dispatch(toggleSelection(id));
+  const toggleSelect = (card: CatCard) => {
+    dispatch(toggleSelection(card));
   };
 
   const handleClearSelection = () => {
     dispatch(clearSelection());
   };
 
+  const downloadLinkRef = useRef<HTMLAnchorElement | null>(null);
+
   const handleDownload = () => {
-    const selectedItems = items.filter((item) => selectedIds.includes(item.id));
+    const selectedItems = Object.values(selectedItemsMap);
+
+    if (selectedItems.length === 0) return;
+
     const csvContent = [
       ['Title', 'Description'],
       ...selectedItems.map((item) => [item.title, item.description || '']),
@@ -128,11 +137,12 @@ const MainBlock: React.FC = () => {
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
 
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `${selectedItems.length}_cat_breeds.csv`;
-    link.click();
-    URL.revokeObjectURL(url);
+    if (downloadLinkRef.current) {
+      downloadLinkRef.current.href = url;
+      downloadLinkRef.current.download = `${selectedItems.length}_cat_breeds.csv`;
+      downloadLinkRef.current.click();
+      URL.revokeObjectURL(url);
+    }
   };
 
   const isLoading = isImagesFetching || isImagesQuerySkipped;
@@ -187,6 +197,16 @@ const MainBlock: React.FC = () => {
           onDownload={handleDownload}
         />
       )}
+
+      <a
+        ref={downloadLinkRef}
+        style={{ display: 'none' }}
+        href="/"
+        download=""
+        aria-hidden="true"
+      >
+        download
+      </a>
     </main>
   );
 };

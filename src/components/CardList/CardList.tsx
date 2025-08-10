@@ -6,15 +6,17 @@ import s from './CardList.module.scss';
 interface CardItem {
   id: string;
   imageId: string;
+  imageUrl: string;
   title: string;
-  imageUrl?: string;
+  description?: string;
+  detailsUrl: string;
 }
 
 interface CardListProps {
   items: CardItem[];
   loading?: boolean;
   selectedIds: string[];
-  onToggleSelect: (id: string) => void;
+  onToggleSelect: (card: CardItem) => void;
 }
 
 const CardList: React.FC<CardListProps> = ({
@@ -23,24 +25,21 @@ const CardList: React.FC<CardListProps> = ({
   selectedIds,
   onToggleSelect,
 }) => {
-  if (loading) {
-    return <CardListSkeleton />;
-  }
+  if (loading) return <CardListSkeleton />;
 
   return (
     <div className={s.wrapper}>
-      {items.map(({ id, imageId, title, imageUrl }) => (
+      {items.map((item) => (
         <Card
-          key={imageId}
-          id={id}
-          title={title}
-          imageUrl={imageUrl}
-          isSelected={selectedIds.includes(id)}
-          onToggleSelect={() => onToggleSelect(id)}
+          key={item.imageId}
+          id={item.id}
+          title={item.title}
+          imageUrl={item.imageUrl}
+          isSelected={selectedIds.includes(item.id)}
+          onToggleSelect={() => onToggleSelect(item)}
         />
       ))}
     </div>
   );
 };
-
 export default CardList;
