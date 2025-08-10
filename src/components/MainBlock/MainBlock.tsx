@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { Outlet, useMatch, useNavigate, useLocation } from 'react-router-dom';
 import useLocalStorage from '../../hooks/useLocalStorage';
 import CardList from '../CardList/CardList';
@@ -8,12 +8,11 @@ import SelectionBlock from '../SelectionBlock/SelectionBlock';
 import s from './MainBlock.module.scss';
 
 import {
-  fetchBreedsByQuery,
-  fetchAllBreeds,
-  fetchCatImages,
-  fetchTotalImageCount,
+  useGetAllBreedsQuery,
+  useGetBreedsByQueryQuery,
+  useGetCatImagesQuery,
+  useGetTotalImageCountQuery,
 } from '../../api/catApi';
-import type { BreedResponse } from '../../api/catApi';
 
 import { useAppSelector, useAppDispatch } from '../../hooks/reduxHooks';
 import { clearSelection, toggleSelection } from '../../features/selectionSlice';
@@ -27,94 +26,77 @@ interface CatCard {
   detailsUrl: string;
 }
 
+const ITEMS_PER_PAGE = 9;
+
 const MainBlock: React.FC = () => {
-  const [items, setItems] = useState<CatCard[]>([]);
-  const [cache, setCache] = useState<Record<number, CatCard[]>>({});
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useLocalStorage<string>('searchTerm', '');
-  const [totalPages, setTotalPages] = useState(1);
-  const [fatalError, setFatalError] = useState(false);
-  const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
-  const [downloadFilename, setDownloadFilename] = useState<string>('');
   const dispatch = useAppDispatch();
   const selectedIds = useAppSelector((state) => state.selection.selectedIds);
 
-  const limit = 9;
   const showDetail = useMatch('/details/:id');
   const location = useLocation();
   const navigate = useNavigate();
 
   const currentPage = useMemo(() => {
-    const searchParams = new URLSearchParams(location.search);
-    const pageParam = searchParams.get('page');
+    const pageParam = new URLSearchParams(location.search).get('page');
     return Math.max(parseInt(pageParam || '1', 10), 1);
   }, [location.search]);
 
-  const fetchData = useCallback(async (): Promise<CatCard[]> => {
-    const trimmed = query.trim();
-    setLoading(true);
-    setError(null);
+  const { data: allBreeds = [] } = useGetAllBreedsQuery(undefined, {
+    skip: !!query.trim(),
+  });
 
-    try {
-      const breedIds: string[] = [];
-      const breedsMap: Map<string, BreedResponse> = new Map();
+  const { data: breedsByQuery = [] } = useGetBreedsByQueryQuery(query, {
+    skip: !query.trim(),
+  });
 
-      if (trimmed) {
-        const breedData = await fetchBreedsByQuery(trimmed);
-        breedData.forEach((breed) => {
-          breedIds.push(breed.id);
-          breedsMap.set(breed.id, breed);
-        });
-      } else {
-        const allBreeds = await fetchAllBreeds();
-        allBreeds.forEach((breed) => breedsMap.set(breed.id, breed));
-      }
+  const breedIds = useMemo(() => {
+    if (query && breedsByQuery.length > 0)
+      return breedsByQuery.map((b) => b.id);
+    if (!query && allBreeds.length > 0) return allBreeds.map((b) => b.id);
+    return [];
+  }, [query, breedsByQuery, allBreeds]);
 
-      const [imageData, totalItemCount] = await Promise.all([
-        fetchCatImages(limit, currentPage - 1, breedIds),
-        fetchTotalImageCount(breedIds),
-      ]);
+  const isImagesQuerySkipped = breedIds.length === 0;
 
-      setTotalPages(Math.max(1, Math.ceil(totalItemCount / limit)));
-
-      return imageData.map((item) => {
-        const breed = item.breeds?.[0];
-        return {
-          id: item.id,
-          imageId: item.id,
-          imageUrl: item.url,
-          title: breed?.name || 'Unknown cat',
-          description: breed?.description || 'No description',
-          detailsUrl: `${window.location.origin}/details/${item.id}`,
-        };
-      });
-    } catch (err) {
-      const errorMessage = (err as Error).message || 'Failed to retrieve data.';
-      console.error(errorMessage);
-      setError(errorMessage);
-      return [];
-    } finally {
-      setLoading(false);
+  const {
+    data: imageData = [],
+    error: imagesError,
+    isFetching: isImagesFetching,
+  } = useGetCatImagesQuery(
+    {
+      limit: ITEMS_PER_PAGE,
+      page: currentPage - 1,
+      breedIds,
+    },
+    {
+      skip: isImagesQuerySkipped,
     }
-  }, [query, currentPage]);
+  );
 
-  useEffect(() => {
-    const cachedItems = cache[currentPage];
+  const { data: totalCount = 0 } = useGetTotalImageCountQuery(
+    { breedIds },
+    { skip: isImagesQuerySkipped }
+  );
 
-    if (cachedItems) {
-      setItems(cachedItems);
-    } else {
-      fetchData().then((data) => {
-        setItems(data);
-        setCache((prev) => ({ ...prev, [currentPage]: data }));
-      });
-    }
-  }, [currentPage, cache, fetchData]);
+  const totalPages = Math.max(1, Math.ceil(totalCount / ITEMS_PER_PAGE));
+
+  const items: CatCard[] = useMemo(() => {
+    return imageData.map((item) => {
+      const breed = item.breeds?.[0];
+      return {
+        id: item.id,
+        imageId: item.id,
+        imageUrl: item.url,
+        title: breed?.name || 'Unknown cat',
+        description: breed?.description || 'No description',
+        detailsUrl: `${window.location.origin}/details/${item.id}`,
+      };
+    });
+  }, [imageData]);
 
   const handleSearch = (newQuery: string) => {
     setQuery(newQuery);
-    setCache({});
     navigate({ pathname: '/', search: '?page=1' });
   };
 
@@ -133,12 +115,7 @@ const MainBlock: React.FC = () => {
   };
 
   const handleDownload = () => {
-    const allCachedItems = Object.values(cache).flat();
-
-    const selectedItems = allCachedItems.filter((item) =>
-      selectedIds.includes(item.id)
-    );
-
+    const selectedItems = items.filter((item) => selectedIds.includes(item.id));
     const csvContent = [
       ['Title', 'Description'],
       ...selectedItems.map((item) => [item.title, item.description || '']),
@@ -151,35 +128,22 @@ const MainBlock: React.FC = () => {
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
 
-    setDownloadFilename(`${selectedItems.length}_cat_breeds.csv`);
-    setDownloadUrl(url);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${selectedItems.length}_cat_breeds.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
   };
 
-  useEffect(() => {
-    if (downloadUrl) {
-      const link = document.createElement('a');
-      link.href = downloadUrl;
-      link.download = downloadFilename;
-      link.click();
-
-      return () => {
-        URL.revokeObjectURL(downloadUrl);
-        setDownloadUrl(null);
-      };
-    }
-  }, [downloadUrl, downloadFilename]);
-
-  if (fatalError) {
-    throw new Error('Simulated error caught by ErrorBoundary');
-  }
+  const isLoading = isImagesFetching || isImagesQuerySkipped;
 
   return (
     <main className={s.main}>
       <Header onSearch={handleSearch} defaultValue={query} />
 
-      {error && (
+      {imagesError && (
         <div className={s.error} role="alert">
-          {error}
+          Error loading data
         </div>
       )}
 
@@ -189,7 +153,7 @@ const MainBlock: React.FC = () => {
             <div className={s.list}>
               <CardList
                 items={items}
-                loading={loading}
+                loading={isLoading}
                 selectedIds={selectedIds}
                 onToggleSelect={toggleSelect}
               />
@@ -201,14 +165,14 @@ const MainBlock: React.FC = () => {
         ) : (
           <CardList
             items={items}
-            loading={loading}
+            loading={isLoading}
             selectedIds={selectedIds}
             onToggleSelect={toggleSelect}
           />
         )}
       </section>
 
-      {!loading && items.length > 0 && (
+      {!isLoading && items.length > 0 && (
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
@@ -223,11 +187,6 @@ const MainBlock: React.FC = () => {
           onDownload={handleDownload}
         />
       )}
-      <div className={s.errorButton}>
-        <button onClick={() => setFatalError(true)} className={s.throwButton}>
-          Trigger error
-        </button>
-      </div>
     </main>
   );
 };
