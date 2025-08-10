@@ -96,7 +96,7 @@ export const catApi = createApi({
 
         return { data: { breed, imageUrl } };
       },
-      providesTags: (result, error, id) => [{ type: 'BreedDetail', id }],
+      providesTags: (_result, _error, id) => [{ type: 'BreedDetail', id }],
     }),
   }),
 });
