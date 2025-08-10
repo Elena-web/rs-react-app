@@ -1,7 +1,9 @@
 .main {
+  min-height: 100vh;
   max-width: 1400px;
   margin: 0 auto;
   padding: 2rem;
+  padding-bottom: calc(80px + 1rem);
   display: flex;
   flex-direction: column;
   gap: 2rem;
@@ -54,4 +56,37 @@
   flex: 1;
   max-width: 30%;
   padding-left: 16px;
+}
+
+.controls {
+	display: flex;
+	gap: 1rem;
+}
+
+.button {
+  background-color: $color-dark-purple;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  transition: $transition-all;
+  position: relative;
+  z-index: 1;
+  font-family: $font-header-family;
+  font-weight: 500;
+  color: $color-white;
+  @include pulse-animation;
+
+  &:hover {
+    color: $color-pink;
+    text-shadow: none;
+  }
+
+  &:disabled {
+    background-color: lighten($color-dark-purple, 15%);
+    color: rgba($color-white, 0.6);
+    cursor: not-allowed;
+    opacity: 0.7;
+    animation: none;
+  }
 }

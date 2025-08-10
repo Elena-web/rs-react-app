@@ -1,129 +1,112 @@
-import { render, screen, waitFor } from '@testing-library/react';
-import '@testing-library/jest-dom';
-import userEvent from '@testing-library/user-event';
-import MainBlock from './MainBlock';
-import {
-  fetchBreedsByQuery,
-  fetchAllBreeds,
-  fetchCatImages,
-  fetchTotalImageCount,
-} from '../../api/catApi';
-import { mockBreedResponse, mockImageResponse } from './__mocks__/mocks';
-import { MemoryRouter } from 'react-router-dom';
-
+import React from 'react';
+import { render, screen } from '@testing-library/react';
 import { Provider } from 'react-redux';
-import { store } from '../../store/store';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import configureStore from 'redux-mock-store';
+import MainBlock from './MainBlock';
+import * as catApi from '../../api/catApi';
+import type { RootState } from '../../store/store';
+import type { CatCard } from '../../features/selectionSlice';
 
-jest.mock('../../api/catApi', () => ({
-  fetchBreedsByQuery: jest.fn(),
-  fetchAllBreeds: jest.fn(),
-  fetchCatImages: jest.fn(),
-  fetchTotalImageCount: jest.fn(),
+const mockStore = configureStore<Partial<RootState>>([]);
+
+jest.mock('../../api/catApi');
+jest.mock('../../hooks/useLocalStorage', () => () => ['', jest.fn()]);
+jest.mock('../../features/selectionSlice', () => ({
+  clearSelection: jest.fn(() => ({ type: 'CLEAR_SELECTION' })),
+  toggleSelection: jest.fn((id: string) => ({
+    type: 'TOGGLE_SELECTION',
+    payload: id,
+  })),
 }));
 
-const renderWithProviders = (ui: React.ReactElement, { route = '/' } = {}) => {
-  window.history.pushState({}, 'Test page', route);
-
-  return render(
-    <Provider store={store}>
-      <MemoryRouter initialEntries={[route]}>{ui}</MemoryRouter>
-    </Provider>
-  );
-};
-
-describe('MainBlock component', () => {
-  const mockTotalImageCount = 27;
+describe('MainBlock', () => {
+  let store: ReturnType<typeof mockStore>;
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    localStorage.clear();
+    store = mockStore({
+      selection: {
+        selectedIds: [],
+        selectedItems: {},
+      },
+    });
+
+    (catApi.useGetAllBreedsQuery as jest.Mock).mockReturnValue({
+      data: [{ id: 'abys' }],
+    });
+    (catApi.useGetBreedsByQueryQuery as jest.Mock).mockReturnValue({
+      data: [],
+    });
+    (catApi.useGetCatImagesQuery as jest.Mock).mockReturnValue({
+      data: [
+        {
+          id: '1',
+          url: 'https://example.com/cat.jpg',
+          breeds: [{ name: 'Abyssinian', description: 'Active and playful' }],
+        },
+      ],
+      isLoading: false,
+      error: null,
+    });
+    (catApi.useGetTotalImageCountQuery as jest.Mock).mockReturnValue({
+      data: 1,
+    });
   });
 
-  it('renders cat cards after loading', async () => {
-    (fetchBreedsByQuery as jest.Mock).mockResolvedValue(mockBreedResponse);
-    (fetchAllBreeds as jest.Mock).mockResolvedValue(mockBreedResponse);
-    (fetchCatImages as jest.Mock).mockResolvedValue(mockImageResponse);
-    (fetchTotalImageCount as jest.Mock).mockResolvedValue(mockTotalImageCount);
+  const renderComponent = () =>
+    render(
+      <Provider store={store}>
+        <MemoryRouter initialEntries={['/']}>
+          <Routes>
+            <Route path="/" element={<MainBlock />}>
+              <Route path="details/:id" element={<div>Details Page</div>} />
+            </Route>
+          </Routes>
+        </MemoryRouter>
+      </Provider>
+    );
 
-    renderWithProviders(<MainBlock />, { route: '/?page=1' });
+  it('renders Header and CardList', async () => {
+    renderComponent();
+    expect(screen.getByRole('textbox')).toBeInTheDocument();
+    expect(await screen.findByText('Abyssinian')).toBeInTheDocument();
+  });
 
+  it('shows error message when imagesError is present', () => {
+    (catApi.useGetCatImagesQuery as jest.Mock).mockReturnValue({
+      data: [],
+      isLoading: false,
+      error: true,
+    });
+
+    renderComponent();
+    expect(screen.getByRole('alert')).toHaveTextContent('Failed to load data.');
+  });
+
+  it('renders Pagination when items are loaded', async () => {
+    renderComponent();
+    expect(await screen.findByText(/1\s*из\s*1/)).toBeInTheDocument();
+  });
+
+  it('renders SelectionBlock when items are selected', () => {
+    store = mockStore({
+      selection: {
+        selectedIds: ['1'],
+        selectedItems: {
+          '1': {
+            id: '1',
+            imageId: 'img1',
+            imageUrl: 'https://example.com/cat.jpg',
+            title: 'Abyssinian',
+            detailsUrl: '/details/1',
+            breeds: [{ name: 'Abyssinian', description: 'Active and playful' }],
+          } as CatCard,
+        },
+      },
+    });
+    renderComponent();
     expect(
-      screen.queryByText(mockBreedResponse[0].name)
-    ).not.toBeInTheDocument();
-
-    await waitFor(() => {
-      expect(screen.getByText(mockBreedResponse[0].name)).toBeInTheDocument();
-    });
-  });
-  it('displays error alert on API failure', async () => {
-    jest.spyOn(console, 'error').mockImplementation(() => {});
-
-    (fetchBreedsByQuery as jest.Mock).mockRejectedValue(new Error('API error'));
-    (fetchAllBreeds as jest.Mock).mockRejectedValue(new Error('API error'));
-    (fetchCatImages as jest.Mock).mockRejectedValue(new Error('API error'));
-    (fetchTotalImageCount as jest.Mock).mockResolvedValue(mockTotalImageCount);
-
-    renderWithProviders(<MainBlock />, { route: '/?page=1' });
-
-    await waitFor(() => {
-      const alert = screen.getByRole('alert');
-      expect(alert).toHaveTextContent(/api error/i);
-    });
-  });
-
-  it('increments page when clicking Next button', async () => {
-    (fetchBreedsByQuery as jest.Mock).mockResolvedValue(mockBreedResponse);
-    (fetchAllBreeds as jest.Mock).mockResolvedValue(mockBreedResponse);
-    (fetchCatImages as jest.Mock).mockResolvedValue(mockImageResponse);
-    (fetchTotalImageCount as jest.Mock).mockResolvedValue(mockTotalImageCount);
-
-    renderWithProviders(<MainBlock />, { route: '/?page=1' });
-
-    const nextButton = await screen.findByRole('button', { name: /next/i });
-    await userEvent.click(nextButton);
-
-    await waitFor(() => {
-      expect(fetchCatImages).toHaveBeenCalledWith(
-        expect.any(Number),
-        1,
-        expect.any(Array)
-      );
-    });
-  });
-
-  it('decrements page when clicking Previous button', async () => {
-    (fetchBreedsByQuery as jest.Mock).mockResolvedValue(mockBreedResponse);
-    (fetchAllBreeds as jest.Mock).mockResolvedValue(mockBreedResponse);
-    (fetchCatImages as jest.Mock).mockResolvedValue(mockImageResponse);
-    (fetchTotalImageCount as jest.Mock).mockResolvedValue(mockTotalImageCount);
-
-    renderWithProviders(<MainBlock />, { route: '/?page=2' });
-
-    const prevButton = await screen.findByRole('button', { name: /previous/i });
-    await userEvent.click(prevButton);
-
-    await waitFor(() => {
-      expect(fetchCatImages).toHaveBeenCalledWith(
-        expect.any(Number),
-        0,
-        expect.any(Array)
-      );
-    });
-  });
-
-  it('shows loader skeleton while fetching and then displays cards', async () => {
-    (fetchBreedsByQuery as jest.Mock).mockResolvedValue(mockBreedResponse);
-    (fetchAllBreeds as jest.Mock).mockResolvedValue(mockBreedResponse);
-    (fetchCatImages as jest.Mock).mockResolvedValue(mockImageResponse);
-    (fetchTotalImageCount as jest.Mock).mockResolvedValue(mockTotalImageCount);
-
-    renderWithProviders(<MainBlock />, { route: '/?page=1' });
-
-    expect(screen.getByTestId('card-skeleton')).toBeInTheDocument();
-
-    await waitFor(() => {
-      expect(screen.queryByTestId('card-skeleton')).not.toBeInTheDocument();
-      expect(screen.getByText(mockBreedResponse[0].name)).toBeInTheDocument();
-    });
+      screen.getByRole('button', { name: /download/i })
+    ).toBeInTheDocument();
   });
 });

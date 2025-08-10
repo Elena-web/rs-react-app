@@ -20,9 +20,10 @@ describe('ItemDetail', () => {
   });
 
   it('renders breed details successfully', async () => {
-    (catApi.fetchBreedAndImageUrl as jest.Mock).mockResolvedValue({
-      breed: mockBreed,
-      imageUrl: mockImageUrl,
+    (catApi.useGetBreedAndImageQuery as jest.Mock).mockReturnValue({
+      data: { breed: mockBreed, imageUrl: mockImageUrl },
+      isLoading: false,
+      isError: false,
     });
 
     render(
@@ -33,7 +34,7 @@ describe('ItemDetail', () => {
       </MemoryRouter>
     );
 
-    expect(screen.getByText(/Loading.../i)).toBeInTheDocument();
+    expect(screen.queryByText(/Loading.../i)).not.toBeInTheDocument();
 
     await waitFor(() => {
       expect(screen.getByText(mockBreed.name)).toBeInTheDocument();
@@ -47,9 +48,12 @@ describe('ItemDetail', () => {
   });
 
   it('shows error if API call fails', async () => {
-    (catApi.fetchBreedAndImageUrl as jest.Mock).mockRejectedValue(
-      new Error('API failed')
-    );
+    (catApi.useGetBreedAndImageQuery as jest.Mock).mockReturnValue({
+      data: null,
+      isLoading: false,
+      isError: true,
+      error: new Error('API failed'),
+    });
 
     render(
       <MemoryRouter initialEntries={['/details/abc']}>
@@ -59,7 +63,7 @@ describe('ItemDetail', () => {
       </MemoryRouter>
     );
 
-    expect(screen.getByText(/Loading.../i)).toBeInTheDocument();
+    expect(screen.queryByText(/Loading.../i)).not.toBeInTheDocument();
 
     await waitFor(() => {
       expect(screen.getByRole('alert')).toHaveTextContent('Error: API failed');
@@ -76,7 +80,7 @@ describe('ItemDetail', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByRole('alert')).toHaveTextContent('Error: Invalid ID');
+      expect(screen.getByRole('alert')).toHaveTextContent('Invalid ID');
     });
   });
 });

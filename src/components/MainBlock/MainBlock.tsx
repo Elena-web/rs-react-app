@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { Outlet, useMatch, useNavigate, useLocation } from 'react-router-dom';
 import useLocalStorage from '../../hooks/useLocalStorage';
 import CardList from '../CardList/CardList';
@@ -8,12 +8,12 @@ import SelectionBlock from '../SelectionBlock/SelectionBlock';
 import s from './MainBlock.module.scss';
 
 import {
-  fetchBreedsByQuery,
-  fetchAllBreeds,
-  fetchCatImages,
-  fetchTotalImageCount,
+  useGetAllBreedsQuery,
+  useGetBreedsByQueryQuery,
+  useGetCatImagesQuery,
+  useGetTotalImageCountQuery,
+  catApi,
 } from '../../api/catApi';
-import type { BreedResponse } from '../../api/catApi';
 
 import { useAppSelector, useAppDispatch } from '../../hooks/reduxHooks';
 import { clearSelection, toggleSelection } from '../../features/selectionSlice';
@@ -27,94 +27,107 @@ interface CatCard {
   detailsUrl: string;
 }
 
-const MainBlock: React.FC = () => {
-  const [items, setItems] = useState<CatCard[]>([]);
-  const [cache, setCache] = useState<Record<number, CatCard[]>>({});
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [query, setQuery] = useLocalStorage<string>('searchTerm', '');
-  const [totalPages, setTotalPages] = useState(1);
-  const [fatalError, setFatalError] = useState(false);
-  const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
-  const [downloadFilename, setDownloadFilename] = useState<string>('');
-  const dispatch = useAppDispatch();
-  const selectedIds = useAppSelector((state) => state.selection.selectedIds);
+const ITEMS_PER_PAGE = 9;
 
-  const limit = 9;
+const MainBlock: React.FC = () => {
+  const [query, setQuery] = useLocalStorage<string>('searchTerm', '');
+  const dispatch = useAppDispatch();
+
+  const selectedIds = useAppSelector((state) => state.selection.selectedIds);
+  const selectedItemsMap = useAppSelector(
+    (state) => state.selection.selectedItems
+  );
+
   const showDetail = useMatch('/details/:id');
   const location = useLocation();
   const navigate = useNavigate();
 
   const currentPage = useMemo(() => {
-    const searchParams = new URLSearchParams(location.search);
-    const pageParam = searchParams.get('page');
+    const pageParam = new URLSearchParams(location.search).get('page');
     return Math.max(parseInt(pageParam || '1', 10), 1);
   }, [location.search]);
 
-  const fetchData = useCallback(async (): Promise<CatCard[]> => {
-    const trimmed = query.trim();
-    setLoading(true);
-    setError(null);
+  const {
+    data: allBreeds = [],
+    error: allBreedsError,
+    isFetching: isAllBreedsFetching,
+    refetch: refetchAllBreeds,
+  } = useGetAllBreedsQuery(undefined, {
+    skip: !!query.trim(),
+    refetchOnReconnect: true,
+    refetchOnFocus: false,
+  });
 
-    try {
-      const breedIds: string[] = [];
-      const breedsMap: Map<string, BreedResponse> = new Map();
+  const {
+    data: breedsByQuery = [],
+    error: breedsByQueryError,
+    isFetching: isBreedsByQueryFetching,
+    refetch: refetchBreedsByQuery,
+  } = useGetBreedsByQueryQuery(query, {
+    skip: !query.trim(),
+    refetchOnReconnect: true,
+    refetchOnFocus: false,
+  });
 
-      if (trimmed) {
-        const breedData = await fetchBreedsByQuery(trimmed);
-        breedData.forEach((breed) => {
-          breedIds.push(breed.id);
-          breedsMap.set(breed.id, breed);
-        });
-      } else {
-        const allBreeds = await fetchAllBreeds();
-        allBreeds.forEach((breed) => breedsMap.set(breed.id, breed));
-      }
+  const breedIds = useMemo(() => {
+    if (query && breedsByQuery.length > 0)
+      return breedsByQuery.map((b) => b.id);
+    if (!query && allBreeds.length > 0) return allBreeds.map((b) => b.id);
+    return [];
+  }, [query, breedsByQuery, allBreeds]);
 
-      const [imageData, totalItemCount] = await Promise.all([
-        fetchCatImages(limit, currentPage - 1, breedIds),
-        fetchTotalImageCount(breedIds),
-      ]);
+  const isImagesQuerySkipped = breedIds.length === 0;
 
-      setTotalPages(Math.max(1, Math.ceil(totalItemCount / limit)));
-
-      return imageData.map((item) => {
-        const breed = item.breeds?.[0];
-        return {
-          id: item.id,
-          imageId: item.id,
-          imageUrl: item.url,
-          title: breed?.name || 'Unknown cat',
-          description: breed?.description || 'No description',
-          detailsUrl: `${window.location.origin}/details/${item.id}`,
-        };
-      });
-    } catch (err) {
-      const errorMessage = (err as Error).message || 'Failed to retrieve data.';
-      console.error(errorMessage);
-      setError(errorMessage);
-      return [];
-    } finally {
-      setLoading(false);
+  const {
+    data: imageData = [],
+    error: imagesError,
+    isFetching: isImagesFetching,
+    refetch: refetchImages,
+  } = useGetCatImagesQuery(
+    {
+      limit: ITEMS_PER_PAGE,
+      page: currentPage - 1,
+      breedIds,
+    },
+    {
+      skip: isImagesQuerySkipped,
+      refetchOnReconnect: true,
+      refetchOnFocus: false,
     }
-  }, [query, currentPage]);
+  );
 
-  useEffect(() => {
-    const cachedItems = cache[currentPage];
-
-    if (cachedItems) {
-      setItems(cachedItems);
-    } else {
-      fetchData().then((data) => {
-        setItems(data);
-        setCache((prev) => ({ ...prev, [currentPage]: data }));
-      });
+  const {
+    data: totalCount = 0,
+    error: countError,
+    isFetching: isCountFetching,
+    refetch: refetchCount,
+  } = useGetTotalImageCountQuery(
+    { breedIds },
+    {
+      skip: isImagesQuerySkipped,
+      refetchOnReconnect: true,
+      refetchOnFocus: false,
     }
-  }, [currentPage, cache, fetchData]);
+  );
+
+  const totalPages = Math.max(1, Math.ceil(totalCount / ITEMS_PER_PAGE));
+
+  const items: CatCard[] = useMemo(() => {
+    return imageData.map((item) => {
+      const breed = item.breeds?.[0];
+      return {
+        id: item.id,
+        imageId: item.id,
+        imageUrl: item.url,
+        title: breed?.name || 'Unknown cat',
+        description: breed?.description || 'No description available',
+        detailsUrl: `${window.location.origin}/details/${item.id}`,
+      };
+    });
+  }, [imageData]);
 
   const handleSearch = (newQuery: string) => {
     setQuery(newQuery);
-    setCache({});
     navigate({ pathname: '/', search: '?page=1' });
   };
 
@@ -124,20 +137,19 @@ const MainBlock: React.FC = () => {
     navigate({ pathname: location.pathname, search: params.toString() });
   };
 
-  const toggleSelect = (id: string) => {
-    dispatch(toggleSelection(id));
+  const toggleSelect = (card: CatCard) => {
+    dispatch(toggleSelection(card));
   };
 
   const handleClearSelection = () => {
     dispatch(clearSelection());
   };
 
-  const handleDownload = () => {
-    const allCachedItems = Object.values(cache).flat();
+  const downloadLinkRef = useRef<HTMLAnchorElement | null>(null);
 
-    const selectedItems = allCachedItems.filter((item) =>
-      selectedIds.includes(item.id)
-    );
+  const handleDownload = () => {
+    const selectedItems = Object.values(selectedItemsMap);
+    if (selectedItems.length === 0) return;
 
     const csvContent = [
       ['Title', 'Description'],
@@ -151,35 +163,56 @@ const MainBlock: React.FC = () => {
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
 
-    setDownloadFilename(`${selectedItems.length}_cat_breeds.csv`);
-    setDownloadUrl(url);
+    if (downloadLinkRef.current) {
+      downloadLinkRef.current.href = url;
+      downloadLinkRef.current.download = `${selectedItems.length}_cat_breeds.csv`;
+      downloadLinkRef.current.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
   };
 
-  useEffect(() => {
-    if (downloadUrl) {
-      const link = document.createElement('a');
-      link.href = downloadUrl;
-      link.download = downloadFilename;
-      link.click();
-
-      return () => {
-        URL.revokeObjectURL(downloadUrl);
-        setDownloadUrl(null);
-      };
+  const handleRefresh = async () => {
+    try {
+      await Promise.all([
+        refetchAllBreeds?.(),
+        refetchBreedsByQuery?.(),
+        refetchImages?.(),
+        refetchCount?.(),
+      ]);
+    } catch (e) {
+      console.error('Refresh failed', e);
     }
-  }, [downloadUrl, downloadFilename]);
+  };
 
-  if (fatalError) {
-    throw new Error('Simulated error caught by ErrorBoundary');
-  }
+  const handleResetCache = () => {
+    dispatch(catApi.util.resetApiState());
+  };
+
+  const isLoading = isImagesFetching || isImagesQuerySkipped;
+  const isAnyFetching =
+    isAllBreedsFetching ||
+    isBreedsByQueryFetching ||
+    isImagesFetching ||
+    isCountFetching;
 
   return (
     <main className={s.main}>
       <Header onSearch={handleSearch} defaultValue={query} />
 
-      {error && (
-        <div className={s.error} role="alert">
-          {error}
+      {(allBreedsError || breedsByQueryError || imagesError || countError) && (
+        <div className={s.error} role="alert" aria-live="assertive">
+          <div>Failed to load data.</div>
+          <div className={s.errorDetails}>
+            {imagesError && <div>- Images loading error</div>}
+            {countError && <div>- Total count loading error</div>}
+            {allBreedsError && <div>- Breed list loading error</div>}
+            {breedsByQueryError && <div>- Breed search error</div>}
+          </div>
+          <div className={s.errorActions}>
+            <button onClick={handleRefresh} disabled={isAnyFetching}>
+              Retry
+            </button>
+          </div>
         </div>
       )}
 
@@ -189,7 +222,7 @@ const MainBlock: React.FC = () => {
             <div className={s.list}>
               <CardList
                 items={items}
-                loading={loading}
+                loading={isLoading}
                 selectedIds={selectedIds}
                 onToggleSelect={toggleSelect}
               />
@@ -201,14 +234,31 @@ const MainBlock: React.FC = () => {
         ) : (
           <CardList
             items={items}
-            loading={loading}
+            loading={isLoading}
             selectedIds={selectedIds}
             onToggleSelect={toggleSelect}
           />
         )}
       </section>
 
-      {!loading && items.length > 0 && (
+      <div className={s.controls}>
+        <button
+          onClick={handleRefresh}
+          disabled={isAnyFetching}
+          className={s.button}
+        >
+          {isAnyFetching ? 'Refreshing...' : 'Refresh Data'}
+        </button>
+        <button
+          onClick={handleResetCache}
+          disabled={isAnyFetching}
+          className={s.button}
+        >
+          Reset All Cache
+        </button>
+      </div>
+
+      {!isLoading && items.length > 0 && (
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
@@ -223,11 +273,16 @@ const MainBlock: React.FC = () => {
           onDownload={handleDownload}
         />
       )}
-      <div className={s.errorButton}>
-        <button onClick={() => setFatalError(true)} className={s.throwButton}>
-          Trigger error
-        </button>
-      </div>
+
+      <a
+        ref={downloadLinkRef}
+        style={{ display: 'none' }}
+        href="/"
+        download=""
+        aria-hidden="true"
+      >
+        download
+      </a>
     </main>
   );
 };

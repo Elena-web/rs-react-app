@@ -14,7 +14,7 @@
     "target": "es6",
     "strict": true,
     "lib": ["DOM", "ESNext"],
-    "types": ["jest", "node"]
+    "types": ["jest", "node", "@testing-library/jest-dom"]
   },
   "include": ["src/types/scss.d.ts", "types/vite-env.d.ts"],
   "exclude": ["node_modules"]
