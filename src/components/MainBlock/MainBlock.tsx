@@ -12,6 +12,7 @@ import {
   useGetBreedsByQueryQuery,
   useGetCatImagesQuery,
   useGetTotalImageCountQuery,
+  catApi,
 } from '../../api/catApi';
 
 import { useAppSelector, useAppDispatch } from '../../hooks/reduxHooks';
@@ -46,12 +47,26 @@ const MainBlock: React.FC = () => {
     return Math.max(parseInt(pageParam || '1', 10), 1);
   }, [location.search]);
 
-  const { data: allBreeds = [] } = useGetAllBreedsQuery(undefined, {
+  const {
+    data: allBreeds = [],
+    error: allBreedsError,
+    isFetching: isAllBreedsFetching,
+    refetch: refetchAllBreeds,
+  } = useGetAllBreedsQuery(undefined, {
     skip: !!query.trim(),
+    refetchOnReconnect: true,
+    refetchOnFocus: false,
   });
 
-  const { data: breedsByQuery = [] } = useGetBreedsByQueryQuery(query, {
+  const {
+    data: breedsByQuery = [],
+    error: breedsByQueryError,
+    isFetching: isBreedsByQueryFetching,
+    refetch: refetchBreedsByQuery,
+  } = useGetBreedsByQueryQuery(query, {
     skip: !query.trim(),
+    refetchOnReconnect: true,
+    refetchOnFocus: false,
   });
 
   const breedIds = useMemo(() => {
@@ -67,6 +82,7 @@ const MainBlock: React.FC = () => {
     data: imageData = [],
     error: imagesError,
     isFetching: isImagesFetching,
+    refetch: refetchImages,
   } = useGetCatImagesQuery(
     {
       limit: ITEMS_PER_PAGE,
@@ -75,12 +91,23 @@ const MainBlock: React.FC = () => {
     },
     {
       skip: isImagesQuerySkipped,
+      refetchOnReconnect: true,
+      refetchOnFocus: false,
     }
   );
 
-  const { data: totalCount = 0 } = useGetTotalImageCountQuery(
+  const {
+    data: totalCount = 0,
+    error: countError,
+    isFetching: isCountFetching,
+    refetch: refetchCount,
+  } = useGetTotalImageCountQuery(
     { breedIds },
-    { skip: isImagesQuerySkipped }
+    {
+      skip: isImagesQuerySkipped,
+      refetchOnReconnect: true,
+      refetchOnFocus: false,
+    }
   );
 
   const totalPages = Math.max(1, Math.ceil(totalCount / ITEMS_PER_PAGE));
@@ -93,7 +120,7 @@ const MainBlock: React.FC = () => {
         imageId: item.id,
         imageUrl: item.url,
         title: breed?.name || 'Unknown cat',
-        description: breed?.description || 'No description',
+        description: breed?.description || 'No description available',
         detailsUrl: `${window.location.origin}/details/${item.id}`,
       };
     });
@@ -122,7 +149,6 @@ const MainBlock: React.FC = () => {
 
   const handleDownload = () => {
     const selectedItems = Object.values(selectedItemsMap);
-
     if (selectedItems.length === 0) return;
 
     const csvContent = [
@@ -141,19 +167,52 @@ const MainBlock: React.FC = () => {
       downloadLinkRef.current.href = url;
       downloadLinkRef.current.download = `${selectedItems.length}_cat_breeds.csv`;
       downloadLinkRef.current.click();
-      URL.revokeObjectURL(url);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
     }
   };
 
+  const handleRefresh = async () => {
+    try {
+      await Promise.all([
+        refetchAllBreeds?.(),
+        refetchBreedsByQuery?.(),
+        refetchImages?.(),
+        refetchCount?.(),
+      ]);
+    } catch (e) {
+      console.error('Refresh failed', e);
+    }
+  };
+
+  const handleResetCache = () => {
+    dispatch(catApi.util.resetApiState());
+  };
+
   const isLoading = isImagesFetching || isImagesQuerySkipped;
+  const isAnyFetching =
+    isAllBreedsFetching ||
+    isBreedsByQueryFetching ||
+    isImagesFetching ||
+    isCountFetching;
 
   return (
     <main className={s.main}>
       <Header onSearch={handleSearch} defaultValue={query} />
 
-      {imagesError && (
-        <div className={s.error} role="alert">
-          Error loading data
+      {(allBreedsError || breedsByQueryError || imagesError || countError) && (
+        <div className={s.error} role="alert" aria-live="assertive">
+          <div>Failed to load data.</div>
+          <div className={s.errorDetails}>
+            {imagesError && <div>- Images loading error</div>}
+            {countError && <div>- Total count loading error</div>}
+            {allBreedsError && <div>- Breed list loading error</div>}
+            {breedsByQueryError && <div>- Breed search error</div>}
+          </div>
+          <div className={s.errorActions}>
+            <button onClick={handleRefresh} disabled={isAnyFetching}>
+              Retry
+            </button>
+          </div>
         </div>
       )}
 
@@ -181,6 +240,23 @@ const MainBlock: React.FC = () => {
           />
         )}
       </section>
+
+      <div className={s.controls}>
+        <button
+          onClick={handleRefresh}
+          disabled={isAnyFetching}
+          className={s.button}
+        >
+          {isAnyFetching ? 'Refreshing...' : 'Refresh Data'}
+        </button>
+        <button
+          onClick={handleResetCache}
+          disabled={isAnyFetching}
+          className={s.button}
+        >
+          Reset All Cache
+        </button>
+      </div>
 
       {!isLoading && items.length > 0 && (
         <Pagination

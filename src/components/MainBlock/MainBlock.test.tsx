@@ -80,7 +80,7 @@ describe('MainBlock', () => {
     });
 
     renderComponent();
-    expect(screen.getByRole('alert')).toHaveTextContent('Error loading data');
+    expect(screen.getByRole('alert')).toHaveTextContent('Failed to load data.');
   });
 
   it('renders Pagination when items are loaded', async () => {
