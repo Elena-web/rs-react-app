@@ -83,3 +83,9 @@
     transform: translateY(-3px);
   }
 }
+
+body[data-theme='dark'] {
+  .container {
+    background: linear-gradient(135deg, #e7e7ef, #28285f);
+  }
+}

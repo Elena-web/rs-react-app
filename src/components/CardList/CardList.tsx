@@ -3,28 +3,40 @@ import Card from '../Card/Card';
 import CardListSkeleton from '../CardListSkeleton/CardListSkeleton';
 import s from './CardList.module.scss';
 
-interface CardListProps {
-  items: Array<{
-    id: string;
-    title: string;
-    imageUrl?: string;
-  }>;
-  loading?: boolean;
+interface CardItem {
+  id: string;
+  imageId: string;
+  title: string;
+  imageUrl?: string;
 }
 
-const CardList: React.FC<CardListProps> = ({ items, loading }) => {
+interface CardListProps {
+  items: CardItem[];
+  loading?: boolean;
+  selectedIds: string[];
+  onToggleSelect: (id: string) => void;
+}
+
+const CardList: React.FC<CardListProps> = ({
+  items,
+  loading = false,
+  selectedIds,
+  onToggleSelect,
+}) => {
   if (loading) {
     return <CardListSkeleton />;
   }
 
   return (
     <div className={s.wrapper}>
-      {items.map((item) => (
+      {items.map(({ id, imageId, title, imageUrl }) => (
         <Card
-          key={`${item.id}-${item.imageUrl}`}
-          id={item.id}
-          title={item.title}
-          imageUrl={item.imageUrl}
+          key={imageId}
+          id={id}
+          title={title}
+          imageUrl={imageUrl}
+          isSelected={selectedIds.includes(id)}
+          onToggleSelect={() => onToggleSelect(id)}
         />
       ))}
     </div>
