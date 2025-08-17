@@ -3,8 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Spinner from '../Spinner/Spinner';
 import s from './ItemDetail.module.scss';
 
-import type { BreedResponse } from '../../api/catApi';
-import { fetchBreedAndImageUrl } from '../../api/catApi';
+import type { BreedResponse } from '../../../api/catApi';
+import { fetchBreedAndImageUrl } from '../../../api/catApi';
 
 interface BreedData {
   breed: BreedResponse;

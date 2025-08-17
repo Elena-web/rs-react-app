@@ -1,0 +1,33 @@
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  font-family: $font-header-family;
+  font-weight: 600;
+  margin-top: 2rem;
+}
+
+.button {
+  background-color: $color-background;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  transition: $transition-all;
+  position: relative;
+  z-index: 1;
+  font-size: 1.2rem;
+  color: $color-pink;
+  @include pulse-animation;
+
+  &:hover {
+    color: $color-dark-purple;
+    text-shadow: none;
+  }
+}
+
+.page {
+  font-size: 16px;
+  color: $color-background;
+}

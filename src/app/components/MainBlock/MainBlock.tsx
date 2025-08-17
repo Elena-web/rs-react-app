@@ -3,7 +3,7 @@ import { Outlet, useMatch, useNavigate, useLocation } from 'react-router-dom';
 import useLocalStorage from '../../../hooks/useLocalStorage';
 import CardList from '../CardList/CardList';
 import Header from '../Header/Header';
-import Pagination from '../../../../../Pagination/Pagination';
+import Pagination from '../Pagination/Pagination';
 import SelectionBlock from '../SelectionBlock/SelectionBlock';
 import s from './MainBlock.module.scss';
 
@@ -16,7 +16,10 @@ import {
 import type { BreedResponse } from '../../../api/catApi';
 
 import { useAppSelector, useAppDispatch } from '../../../hooks/reduxHooks';
-import { clearSelection, toggleSelection } from '../../../features/selectionSlice';
+import {
+  clearSelection,
+  toggleSelection,
+} from '../../../features/selectionSlice';
 
 interface CatCard {
   id: string;
