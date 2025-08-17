@@ -1,9 +1,4 @@
 {
-  "files": [],
-  "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
-  ],
   "compilerOptions": {
     "outDir": "./dist",
     "moduleResolution": "node",
@@ -16,6 +11,11 @@
     "lib": ["DOM", "ESNext"],
     "types": ["jest", "node"]
   },
-  "include": ["src/types/scss.d.ts", "types/vite-env.d.ts"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "src/types/global.d.ts"
+  ],
   "exclude": ["node_modules"]
 }

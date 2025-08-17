@@ -1,5 +1,6 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+'use client';
+
+import Link from 'next/link';
 import s from './Card.module.scss';
 
 interface CardProps {
@@ -26,12 +27,7 @@ const Card: React.FC<CardProps> = ({
 
   return (
     <div className={s.cardWrapper}>
-      <Link
-        to={`/details/${id}`}
-        state={{ breedId: id }}
-        className={s.card}
-        data-testid="card"
-      >
+      <Link href={`/details/${id}`} className={s.card}>
         <div className={s.checkboxWrapper}>
           <input
             type="checkbox"

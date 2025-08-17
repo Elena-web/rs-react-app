@@ -1,24 +1,35 @@
-import { NavLink } from 'react-router-dom';
-import pawIcon from '../../assets/icon-paw.png';
+'use client';
+
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+//import pawIcon from '../../assets/icon-paw.png';
+import Image from 'next/image';
 import { useTheme } from '../../context/ThemeContext';
 import s from './Navigation.module.scss';
 
 const Navigation = () => {
   const { theme, toggleTheme } = useTheme();
+  const pathname = usePathname();
 
   return (
     <nav className={s.nav}>
-      <NavLink to="/" className={s.logo}>
-        <img src={pawIcon} className={s.image} alt="Cats" />
+      <Link href="/" className={s.logo}>
+        <Image src="/icon-paw.png" className={s.image} alt="Cats" />
         <p>Cats</p>
-      </NavLink>
+      </Link>
       <div className={s.container}>
-        <NavLink to="/" className={s.link}>
+        <Link
+          href="/"
+          className={`${s.link} ${pathname === '/' ? s.active : ''}`}
+        >
           Home
-        </NavLink>
-        <NavLink to="/about" className={s.link}>
+        </Link>
+        <Link
+          href="/about"
+          className={`${s.link} ${pathname === '/about' ? s.active : ''}`}
+        >
           About
-        </NavLink>
+        </Link>
         <button onClick={toggleTheme} className={s.button}>
           Switch to {theme === 'light' ? 'dark' : 'light'} theme
         </button>
