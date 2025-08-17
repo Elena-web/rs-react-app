@@ -11,7 +11,7 @@ import {
 import type {
   MockImage,
   MockBreed,
-} from '../components/MainBlock/__mocks__/mocks';
+} from '../app/components/MainBlock/__mocks__/mocks';
 
 beforeEach(() => {
   fetchMock.resetMocks();

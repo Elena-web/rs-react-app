@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 //import pawIcon from '../../assets/icon-paw.png';
 import Image from 'next/image';
-import { useTheme } from '../../context/ThemeContext';
+import { useTheme } from '../../../context/ThemeContext';
 import s from './Navigation.module.scss';
 
 const Navigation = () => {

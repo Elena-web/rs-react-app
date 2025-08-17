@@ -1,6 +1,6 @@
 import React from 'react';
-import ErrorBoundary from '../../components/ErrorBoundary/ErrorBoundary';
-import MainBlock from '../../components/MainBlock/MainBlock';
+import ErrorBoundary from '../../app/components/ErrorBoundary/ErrorBoundary';
+import MainBlock from '../../app/components/MainBlock/MainBlock';
 
 const Home: React.FC = () => {
   return (

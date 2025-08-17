@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Navigation from './components/Navigation/Navigation';
+import Navigation from './app/components/Navigation/Navigation';
 import Home from './pages/Home/Home';
 import ItemDetail from './components/ItemDetail/ItemDetail';
 import About from './pages/About/About';
 import NotFound from './pages/NotFound/NotFound';
-import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
+import ErrorBoundary from './app/components/ErrorBoundary/ErrorBoundary';
 import { useTheme } from './context/ThemeContext';
 
 const App: React.FC = () => {

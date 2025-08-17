@@ -5,7 +5,7 @@ import { store } from '../store/store';
 import { Provider } from 'react-redux';
 import Head from 'next/head';
 import { ThemeProvider } from '../context/ThemeContext';
-import ErrorBoundary from '../components/ErrorBoundary/ErrorBoundary';
+import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
 
 export default function RootLayout({
   children,
