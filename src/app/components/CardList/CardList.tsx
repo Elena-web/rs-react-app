@@ -1,4 +1,3 @@
-import React from 'react';
 import Card from '../Card/Card';
 import CardListSkeleton from '../CardListSkeleton/CardListSkeleton';
 import s from './CardList.module.scss';
@@ -17,12 +16,12 @@ interface CardListProps {
   onToggleSelect: (id: string) => void;
 }
 
-const CardList: React.FC<CardListProps> = ({
+const CardList = ({
   items,
   loading = false,
   selectedIds,
   onToggleSelect,
-}) => {
+}: CardListProps) => {
   if (loading) {
     return <CardListSkeleton />;
   }
@@ -36,7 +35,7 @@ const CardList: React.FC<CardListProps> = ({
           title={title}
           imageUrl={imageUrl}
           isSelected={selectedIds.includes(id)}
-          onToggleSelect={() => onToggleSelect(id)}
+          onToggleSelect={onToggleSelect}
         />
       ))}
     </div>

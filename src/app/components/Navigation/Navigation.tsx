@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-//import pawIcon from '../../assets/icon-paw.png';
+import pawIcon from '../../../assets/icon-paw.png';
 import Image from 'next/image';
 import { useTheme } from '../../../context/ThemeContext';
 import s from './Navigation.module.scss';
@@ -14,7 +14,17 @@ const Navigation = () => {
   return (
     <nav className={s.nav}>
       <Link href="/" className={s.logo}>
-        <Image src="/icon-paw.png" className={s.image} alt="Cats" />
+        <div
+          className={s.logoImageWrapper}
+          style={{ position: 'relative', width: '32px', height: '32px' }}
+        >
+          <Image
+            src={pawIcon}
+            alt="Cats"
+            fill
+            style={{ objectFit: 'contain' }}
+          />
+        </div>
         <p>Cats</p>
       </Link>
       <div className={s.container}>

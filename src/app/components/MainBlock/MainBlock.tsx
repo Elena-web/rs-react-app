@@ -1,5 +1,8 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Outlet, useMatch, useNavigate, useLocation } from 'react-router-dom';
+'use client';
+
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+
 import useLocalStorage from '../../../hooks/useLocalStorage';
 import CardList from '../CardList/CardList';
 import Header from '../Header/Header';
@@ -30,7 +33,7 @@ interface CatCard {
   detailsUrl: string;
 }
 
-const MainBlock: React.FC = () => {
+const MainBlock = () => {
   const [items, setItems] = useState<CatCard[]>([]);
   const [cache, setCache] = useState<Record<number, CatCard[]>>({});
   const [loading, setLoading] = useState(false);
@@ -40,19 +43,21 @@ const MainBlock: React.FC = () => {
   const [fatalError, setFatalError] = useState(false);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   const [downloadFilename, setDownloadFilename] = useState<string>('');
+
   const dispatch = useAppDispatch();
   const selectedIds = useAppSelector((state) => state.selection.selectedIds);
 
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
   const limit = 9;
-  const showDetail = useMatch('/details/:id');
-  const location = useLocation();
-  const navigate = useNavigate();
 
   const currentPage = useMemo(() => {
-    const searchParams = new URLSearchParams(location.search);
+    if (!searchParams) return 1;
     const pageParam = searchParams.get('page');
     return Math.max(parseInt(pageParam || '1', 10), 1);
-  }, [location.search]);
+  }, [searchParams]);
 
   const fetchData = useCallback(async (): Promise<CatCard[]> => {
     const trimmed = query.trim();
@@ -82,14 +87,19 @@ const MainBlock: React.FC = () => {
       setTotalPages(Math.max(1, Math.ceil(totalItemCount / limit)));
 
       return imageData.map((item) => {
-        const breed = item.breeds?.[0];
+        let breed: BreedResponse | undefined;
+
+        if (!breed && breedIds.length > 0) {
+          breed = breedsMap.get(breedIds[0]);
+        }
+
         return {
           id: item.id,
           imageId: item.id,
           imageUrl: item.url,
-          title: breed?.name || 'Unknown cat',
+          title: breed?.name || 'Cat',
           description: breed?.description || 'No description',
-          detailsUrl: `${window.location.origin}/details/${item.id}`,
+          detailsUrl: `/details/${item.id}`,
         };
       });
     } catch (err) {
@@ -118,13 +128,15 @@ const MainBlock: React.FC = () => {
   const handleSearch = (newQuery: string) => {
     setQuery(newQuery);
     setCache({});
-    navigate({ pathname: '/', search: '?page=1' });
+    router.push(`/?page=1`);
   };
 
   const handlePageChange = (page: number) => {
-    const params = new URLSearchParams(location.search);
+    if (!searchParams) return;
+
+    const params = new URLSearchParams(searchParams.toString());
     params.set('page', page.toString());
-    navigate({ pathname: location.pathname, search: params.toString() });
+    router.push(`${pathname}?${params.toString()}`);
   };
 
   const toggleSelect = (id: string) => {
@@ -187,28 +199,12 @@ const MainBlock: React.FC = () => {
       )}
 
       <section className={s.results}>
-        {showDetail ? (
-          <div className={s.split}>
-            <div className={s.list}>
-              <CardList
-                items={items}
-                loading={loading}
-                selectedIds={selectedIds}
-                onToggleSelect={toggleSelect}
-              />
-            </div>
-            <div className={s.detail}>
-              <Outlet />
-            </div>
-          </div>
-        ) : (
-          <CardList
-            items={items}
-            loading={loading}
-            selectedIds={selectedIds}
-            onToggleSelect={toggleSelect}
-          />
-        )}
+        <CardList
+          items={items}
+          loading={loading}
+          selectedIds={selectedIds}
+          onToggleSelect={toggleSelect}
+        />
       </section>
 
       {!loading && items.length > 0 && (
@@ -226,6 +222,7 @@ const MainBlock: React.FC = () => {
           onDownload={handleDownload}
         />
       )}
+
       <div className={s.errorButton}>
         <button onClick={() => setFatalError(true)} className={s.throwButton}>
           Trigger error

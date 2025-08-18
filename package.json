@@ -5,9 +5,10 @@
   "type": "module",
   "homepage": "https://elena-web.github.io/rs-react-app",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
     "preview": "vite preview",
     "prepare": "husky install",
     "format:fix": "prettier --write .",
@@ -25,10 +26,13 @@
   "dependencies": {
     "@reduxjs/toolkit": "^2.8.2",
     "next": "^15.4.6",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
+    "next-intl": "^4.3.4",
+    "next-redux-wrapper": "^8.1.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
     "react-redux": "^9.2.0",
-    "react-router-dom": "^7.7.1"
+    "react-router-dom": "^7.7.1",
+    "sass": "^1.90.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.30.1",
@@ -36,8 +40,9 @@
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
     "@types/jest": "^30.0.0",
-    "@types/react": "^19.1.8",
-    "@types/react-dom": "^19.1.6",
+    "@types/node": "^24.3.0",
+    "@types/react": "^19.1.10",
+    "@types/react-dom": "^19.1.7",
     "@types/react-router-dom": "^5.3.3",
     "@types/redux-mock-store": "^1.5.0",
     "@vitejs/plugin-react": "^4.7.0",

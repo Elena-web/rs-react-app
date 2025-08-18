@@ -8,7 +8,10 @@ import {
   fetchCatImages,
   fetchTotalImageCount,
 } from '../../api/catApi';
-import { mockBreedResponse, mockImageResponse } from '../../app/components/MainBlock/__mocks__/mocks';
+import {
+  mockBreedResponse,
+  mockImageResponse,
+} from '../../app/components/MainBlock/__mocks__/mocks';
 import { MemoryRouter } from 'react-router-dom';
 
 import { Provider } from 'react-redux';

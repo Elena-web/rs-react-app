@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import s from './SelectionBlock.module.scss';
 
@@ -7,7 +9,7 @@ interface SelectionBarProps {
   onDownload: () => void;
 }
 
-const SelectionBar: React.FC<SelectionBarProps> = ({
+const SelectionBlock: React.FC<SelectionBarProps> = ({
   selectedCount,
   onClear,
   onDownload,
@@ -25,4 +27,4 @@ const SelectionBar: React.FC<SelectionBarProps> = ({
   );
 };
 
-export default SelectionBar;
+export default SelectionBlock;

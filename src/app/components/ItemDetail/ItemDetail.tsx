@@ -1,5 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+'use client';
+
+import { useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import Spinner from '../Spinner/Spinner';
 import s from './ItemDetail.module.scss';
 
@@ -11,9 +14,10 @@ interface BreedData {
   imageUrl: string | null;
 }
 
-const ItemDetail: React.FC = () => {
-  const { id } = useParams<{ id?: string }>();
-  const navigate = useNavigate();
+const ItemDetail = () => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const id = searchParams?.get('id') || '';
 
   const [breedData, setBreedData] = useState<BreedData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -30,15 +34,12 @@ const ItemDetail: React.FC = () => {
     setError(null);
 
     fetchBreedAndImageUrl(id)
-      .then(({ breed, imageUrl }) => {
-        setBreedData({ breed, imageUrl });
-      })
+      .then(({ breed, imageUrl }) => setBreedData({ breed, imageUrl }))
       .catch((err) => setError(err.message || 'Failed to fetch breed details.'))
       .finally(() => setLoading(false));
   }, [id]);
 
   if (loading) return <Spinner />;
-
   if (error) return <div role="alert">Error: {error}</div>;
   if (!breedData) return <div>Item Not Found</div>;
 
@@ -46,7 +47,7 @@ const ItemDetail: React.FC = () => {
 
   return (
     <div className={s.card}>
-      <button className={s.closeButton} onClick={() => navigate(-1)}>
+      <button className={s.closeButton} onClick={() => router.back()}>
         &times;
       </button>
       <h3 className={s.title}>{breed.name}</h3>

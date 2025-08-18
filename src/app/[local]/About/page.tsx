@@ -5,7 +5,7 @@ import Link from 'next/link';
 import authorPhoto from '../../assets/author.jpeg';
 import s from './About.module.scss';
 
-export default function About() {
+export default function AboutPage() {
   return (
     <div className={s.container}>
       <div className={s.card}>

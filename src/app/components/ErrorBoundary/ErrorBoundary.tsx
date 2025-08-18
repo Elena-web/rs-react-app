@@ -1,7 +1,7 @@
-import React, { Component } from 'react';
-import type { ReactNode } from 'react';
-import s from './ErrorBoundary.module.scss';
+'use client';
 
+import { Component, ReactNode } from 'react';
+import s from './ErrorBoundary.module.scss';
 interface ErrorBoundaryProps {
   children: ReactNode;
   reloadFn?: () => void;
@@ -13,23 +13,19 @@ interface ErrorBoundaryState {
 }
 
 class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  constructor(props: ErrorBoundaryProps) {
-    super(props);
-    this.state = { hasError: false, error: null };
-  }
+  state: ErrorBoundaryState = { hasError: false, error: null };
 
-  static getDerivedStateFromError(error: Error) {
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+  componentDidCatch(error: Error, errorInfo: unknown) {
     console.error('Error caught by ErrorBoundary:', error, errorInfo);
   }
 
   render() {
-    const { reloadFn } = this.props;
-
     if (this.state.hasError) {
+      const { reloadFn } = this.props;
       return (
         <div className={s.errorBoundary}>
           <h2>Something went wrong.</h2>

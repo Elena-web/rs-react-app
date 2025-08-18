@@ -3,9 +3,9 @@
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: $color-background;
-  color: $color-dark-purple;
-  font-family: $font-header-family;
+  background-color: #ffe3ec;
+  color: #28285f;
+  font-family: 'Roboto', sans-serif;
   font-size: 1.5rem;
   font-weight: 700;
   padding: 16px;
@@ -17,23 +17,35 @@
 }
 
 .selectionBar button {
-  background-color: $color-light-pink;
+  background-color: #fff1f5;
   padding: 0.5rem 1rem;
   border-radius: 5px;
   border: none;
   cursor: pointer;
-  transition: $transition-all;
+  transition: all 0.3s ease;
   position: relative;
   z-index: 1;
   margin-top: 1.5rem;
-  font-family: $font-header-family;
+  font-family: 'Roboto', sans-serif;
   font-weight: 500;
-  color: $color-pink;
+  color: #ff00cc;
   margin-left: 10px;
-  @include pulse-animation;
+  animation: pulse 1s infinite;
 
   &:hover {
     text-shadow: none;
     transform: translateY(-3px);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 5px #ff00cc;
+  }
+  50% {
+    box-shadow: 0 0 20px #ff00cc;
+  }
+  100% {
+    box-shadow: 0 0 5px #ff00cc;
   }
 }

@@ -1,3 +1,5 @@
+'use client';
+
 import s from './Spinner.module.scss';
 
 const Spinner = () => {
@@ -8,4 +10,5 @@ const Spinner = () => {
     </div>
   );
 };
+
 export default Spinner;

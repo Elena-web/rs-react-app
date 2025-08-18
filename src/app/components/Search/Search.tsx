@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import s from './Search.module.scss';
 
@@ -20,7 +22,9 @@ const Search: React.FC<SearchProps> = ({ onSearch, defaultValue = '' }) => {
   const handleSearch = () => {
     const trimmedValue = inputValue.trim();
     onSearch(trimmedValue);
-    localStorage.setItem('searchTerm', JSON.stringify(trimmedValue));
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('searchTerm', trimmedValue);
+    }
   };
 
   return (

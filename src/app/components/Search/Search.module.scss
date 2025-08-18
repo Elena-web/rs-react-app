@@ -8,42 +8,54 @@
   padding: 0.5rem 1rem;
   font-size: 1rem;
   border-radius: 6px;
-  border: 1px solid $color-input-border;
+  border: 1px solid rgba(255, 192, 203, 0.5);
   width: 250px;
-  color: $color-input-text;
-  background-color: $color-input-background;
+  color: black;
+  background-color: #fdf6fb;
   transition:
     border-color 0.3s ease,
     box-shadow 0.3s ease;
 
   &::placeholder {
-    color: $color-placeholder;
+    color: #9b9d9f;
   }
 
   &:focus {
     outline: none;
-    border-color: $color-input-focus;
-    box-shadow: 0 0 20px $color-pink;
-    background-color: $color-input-focus-bg;
+    border-color: #ff00cc;
+    box-shadow: 0 0 20px #ff00cc;
+    background-color: #fff0f8;
   }
 }
 
 .button {
-  background-color: $color-dark-purple;
+  background-color: #28285f;
   padding: 0.5rem 1rem;
   border-radius: 5px;
   border: none;
   cursor: pointer;
-  transition: $transition-all;
+  transition: all 0.3s ease;
   position: relative;
   z-index: 1;
-  font-family: $font-header-family;
+  font-family: 'Roboto', sans-serif;
   font-weight: 500;
-  color: $color-white;
-  @include pulse-animation;
+  color: #ffffff;
+  animation: pulse 1s infinite;
 
   &:hover {
-    color: $color-pink;
+    color: #ff00cc;
     text-shadow: none;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 5px #ff00cc;
+  }
+  50% {
+    box-shadow: 0 0 20px #ff00cc;
+  }
+  100% {
+    box-shadow: 0 0 5px #ff00cc;
   }
 }
