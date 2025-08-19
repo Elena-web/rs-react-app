@@ -11,7 +11,7 @@
     },
     "distDir": "./dist",
     "cleanDistDir": true,
-    "assetPrefix": "",
+    "assetPrefix": "/rs-react-app",
     "cacheMaxMemorySize": 52428800,
     "configOrigin": "next.config.ts",
     "useFileSystemPublicRoutes": true,
@@ -45,7 +45,7 @@
         256,
         384
       ],
-      "path": "/_next/image",
+      "path": "/rs-react-app/_next/image",
       "loader": "default",
       "loaderFile": "",
       "domains": [],
@@ -68,9 +68,9 @@
       "pagesBufferLength": 5
     },
     "amp": {
-      "canonicalBase": ""
+      "canonicalBase": "/rs-react-app"
     },
-    "basePath": "",
+    "basePath": "/rs-react-app",
     "sassOptions": {},
     "trailingSlash": false,
     "i18n": null,

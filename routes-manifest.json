@@ -2,8 +2,16 @@
   "version": 3,
   "pages404": true,
   "caseSensitive": false,
-  "basePath": "",
+  "basePath": "/rs-react-app",
   "redirects": [
+    {
+      "source": "/rs-react-app/",
+      "destination": "/rs-react-app",
+      "basePath": false,
+      "internal": true,
+      "statusCode": 308,
+      "regex": "^/rs-react-app/$"
+    },
     {
       "source": "/:path+/",
       "destination": "/:path+",
