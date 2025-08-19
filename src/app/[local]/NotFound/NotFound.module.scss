@@ -3,7 +3,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-family: $font-header-family;
+  font-family: 'Roboto', sans-serif;
   height: 100vh;
 }
 
@@ -15,20 +15,20 @@
 .txt {
   font-size: 2.5rem;
   margin-bottom: 0.5rem;
-  color: $color-pink;
+  color: #ff00cc;
   text-shadow:
-    0 0 5px $color-pink,
-    0 0 10px $color-pink,
-    0 0 20px $color-pink;
+    0 0 5px #ff00cc,
+    0 0 10px #ff00cc,
+    0 0 20px #ff00cc;
   font-weight: 700;
   animation: glowTitle 2s ease-in-out infinite alternate;
 }
 
 @keyframes glowTitle {
   0% {
-    text-shadow: 0 0 5px $color-pink;
+    text-shadow: 0 0 5px #ff00cc;
   }
   100% {
-    text-shadow: 0 0 25px $color-pink;
+    text-shadow: 0 0 25px #ff00cc;
   }
 }

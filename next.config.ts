@@ -8,7 +8,6 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
-  dynamicParams: true,
 };
 
 export default withNextIntl(nextConfig);

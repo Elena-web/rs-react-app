@@ -1,15 +1,14 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-
+import { Suspense } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import useLocalStorage from '../../../hooks/useLocalStorage';
 import CardList from '../CardList/CardList';
 import Header from '../Header/Header';
 import Pagination from '../Pagination/Pagination';
 import SelectionBlock from '../SelectionBlock/SelectionBlock';
 import s from './MainBlock.module.scss';
-
 import {
   fetchBreedsByQuery,
   fetchAllBreeds,
@@ -17,7 +16,6 @@ import {
   fetchTotalImageCount,
 } from '../../../api/catApi';
 import type { BreedResponse } from '../../../api/catApi';
-
 import { useAppSelector, useAppDispatch } from '../../../hooks/reduxHooks';
 import {
   clearSelection,
@@ -33,7 +31,11 @@ interface CatCard {
   detailsUrl: string;
 }
 
-const MainBlock = () => {
+interface MainBlockProps {
+  initialPage: number;
+}
+
+const MainBlock: React.FC<MainBlockProps> = ({ initialPage }) => {
   const [items, setItems] = useState<CatCard[]>([]);
   const [cache, setCache] = useState<Record<number, CatCard[]>>({});
   const [loading, setLoading] = useState(false);
@@ -49,63 +51,50 @@ const MainBlock = () => {
 
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
 
   const limit = 9;
-
-  const currentPage = useMemo(() => {
-    if (!searchParams) return 1;
-    const pageParam = searchParams.get('page');
-    return Math.max(parseInt(pageParam || '1', 10), 1);
-  }, [searchParams]);
+  const currentPage = initialPage;
 
   const fetchData = useCallback(async (): Promise<CatCard[]> => {
-    const trimmed = query.trim();
     setLoading(true);
     setError(null);
 
     try {
+      const trimmedQuery = query.trim();
       const breedIds: string[] = [];
       const breedsMap: Map<string, BreedResponse> = new Map();
 
-      if (trimmed) {
-        const breedData = await fetchBreedsByQuery(trimmed);
-        breedData.forEach((breed) => {
-          breedIds.push(breed.id);
-          breedsMap.set(breed.id, breed);
-        });
-      } else {
-        const allBreeds = await fetchAllBreeds();
-        allBreeds.forEach((breed) => breedsMap.set(breed.id, breed));
-      }
+      const breeds = trimmedQuery
+        ? await fetchBreedsByQuery(trimmedQuery)
+        : await fetchAllBreeds();
 
-      const [imageData, totalItemCount] = await Promise.all([
+      breeds.forEach((breed) => {
+        breedIds.push(breed.id);
+        breedsMap.set(breed.id, breed);
+      });
+
+      const [images, totalCount] = await Promise.all([
         fetchCatImages(limit, currentPage - 1, breedIds),
         fetchTotalImageCount(breedIds),
       ]);
 
-      setTotalPages(Math.max(1, Math.ceil(totalItemCount / limit)));
+      setTotalPages(Math.max(1, Math.ceil(totalCount / limit)));
 
-      return imageData.map((item) => {
-        let breed: BreedResponse | undefined;
-
-        if (!breed && breedIds.length > 0) {
-          breed = breedsMap.get(breedIds[0]);
-        }
-
+      return images.map((img) => {
+        const breed = breedsMap.get(breedIds[0]);
         return {
-          id: item.id,
-          imageId: item.id,
-          imageUrl: item.url,
+          id: img.id,
+          imageId: img.id,
+          imageUrl: img.url,
           title: breed?.name || 'Cat',
           description: breed?.description || 'No description',
-          detailsUrl: `/details/${item.id}`,
+          detailsUrl: `/details/${img.id}`,
         };
       });
     } catch (err) {
-      const errorMessage = (err as Error).message || 'Failed to retrieve data.';
-      console.error(errorMessage);
-      setError(errorMessage);
+      const message = (err as Error).message || 'Failed to fetch data';
+      console.error(message);
+      setError(message);
       return [];
     } finally {
       setLoading(false);
@@ -113,10 +102,9 @@ const MainBlock = () => {
   }, [query, currentPage]);
 
   useEffect(() => {
-    const cachedItems = cache[currentPage];
-
-    if (cachedItems) {
-      setItems(cachedItems);
+    const cached = cache[currentPage];
+    if (cached) {
+      setItems(cached);
     } else {
       fetchData().then((data) => {
         setItems(data);
@@ -132,103 +120,88 @@ const MainBlock = () => {
   };
 
   const handlePageChange = (page: number) => {
-    if (!searchParams) return;
-
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams();
     params.set('page', page.toString());
     router.push(`${pathname}?${params.toString()}`);
   };
 
-  const toggleSelect = (id: string) => {
-    dispatch(toggleSelection(id));
-  };
-
-  const handleClearSelection = () => {
-    dispatch(clearSelection());
-  };
+  const toggleSelect = (id: string) => dispatch(toggleSelection(id));
+  const handleClearSelection = () => dispatch(clearSelection());
 
   const handleDownload = () => {
-    const allCachedItems = Object.values(cache).flat();
-
-    const selectedItems = allCachedItems.filter((item) =>
+    const allItems = Object.values(cache).flat();
+    const selectedItems = allItems.filter((item) =>
       selectedIds.includes(item.id)
     );
 
-    const csvContent = [
+    const csv = [
       ['Title', 'Description'],
-      ...selectedItems.map((item) => [item.title, item.description || '']),
+      ...selectedItems.map((i) => [i.title, i.description || '']),
     ]
-      .map((row) =>
-        row.map((field) => `"${String(field).replace(/"/g, '""')}"`).join(',')
-      )
+      .map((row) => row.map((f) => `"${f.replace(/"/g, '""')}"`).join(','))
       .join('\n');
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
-
     setDownloadFilename(`${selectedItems.length}_cat_breeds.csv`);
     setDownloadUrl(url);
   };
 
   useEffect(() => {
-    if (downloadUrl) {
-      const link = document.createElement('a');
-      link.href = downloadUrl;
-      link.download = downloadFilename;
-      link.click();
-
-      return () => {
-        URL.revokeObjectURL(downloadUrl);
-        setDownloadUrl(null);
-      };
-    }
+    if (!downloadUrl) return;
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = downloadFilename;
+    link.click();
+    URL.revokeObjectURL(downloadUrl);
+    setDownloadUrl(null);
   }, [downloadUrl, downloadFilename]);
 
-  if (fatalError) {
-    throw new Error('Simulated error caught by ErrorBoundary');
-  }
+  if (fatalError) throw new Error('Simulated error caught by ErrorBoundary');
 
   return (
-    <main className={s.main}>
-      <Header onSearch={handleSearch} defaultValue={query} />
+    <Suspense>
+      <main className={s.main}>
+        <Header onSearch={handleSearch} defaultValue={query} />
 
-      {error && (
-        <div className={s.error} role="alert">
-          {error}
+        {error && (
+          <div className={s.error} role="alert">
+            {error}
+          </div>
+        )}
+
+        <section className={s.results}>
+          <CardList
+            items={items}
+            loading={loading}
+            selectedIds={selectedIds}
+            onToggleSelect={toggleSelect}
+          />
+        </section>
+
+        {!loading && items.length > 0 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        )}
+
+        {selectedIds.length > 0 && (
+          <SelectionBlock
+            selectedCount={selectedIds.length}
+            onClear={handleClearSelection}
+            onDownload={handleDownload}
+          />
+        )}
+
+        <div className={s.errorButton}>
+          <button onClick={() => setFatalError(true)} className={s.throwButton}>
+            Trigger error
+          </button>
         </div>
-      )}
-
-      <section className={s.results}>
-        <CardList
-          items={items}
-          loading={loading}
-          selectedIds={selectedIds}
-          onToggleSelect={toggleSelect}
-        />
-      </section>
-
-      {!loading && items.length > 0 && (
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={handlePageChange}
-        />
-      )}
-
-      {selectedIds.length > 0 && (
-        <SelectionBlock
-          selectedCount={selectedIds.length}
-          onClear={handleClearSelection}
-          onDownload={handleDownload}
-        />
-      )}
-
-      <div className={s.errorButton}>
-        <button onClick={() => setFatalError(true)} className={s.throwButton}>
-          Trigger error
-        </button>
-      </div>
-    </main>
+      </main>
+    </Suspense>
   );
 };
 

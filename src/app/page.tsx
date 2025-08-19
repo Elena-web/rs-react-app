@@ -1,15 +1,14 @@
-'use client';
-
 import React from 'react';
+import { Suspense } from 'react';
 import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
-import MainBlock from './components/MainBlock/MainBlock';
+import MainBlockWrapper from './components/MainBlockWrapper/MainBlockWrapper';
 
-const HomePage: React.FC = () => {
+export default function HomePage() {
   return (
+	<Suspense fallback={<div>Loading...</div>}>
     <ErrorBoundary>
-      <MainBlock />
+      <MainBlockWrapper />
     </ErrorBoundary>
+	</Suspense>
   );
-};
-
-export default HomePage;
+}

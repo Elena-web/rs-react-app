@@ -4,17 +4,17 @@
   align-items: center;
   min-height: 100vh;
   padding: 3rem;
-  background-color: $color-light-pink;
+  background-color: #fff1f5;
 }
 
 .card {
-  font-family: $font-header-family;
+  font-family: 'Roboto', sans-serif;
   max-width: 500px;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 1.5rem;
-  background: $color-white;
+  background: #fff;
   border-radius: 1.5rem;
   box-shadow: 0 1.5rem 3rem rgba(0, 0, 0, 0.1);
   overflow: hidden;
@@ -23,7 +23,7 @@
 .title {
   font-size: 2rem;
   margin-bottom: 0.5rem;
-  color: $color-dark-blue;
+  color: #28285f;
 }
 
 .content {
@@ -56,27 +56,27 @@
   font-size: 1.4rem;
   font-weight: 400;
   font-style: italic;
-  color: $color-dark-purple;
+  color: #28285f;
 
   &:hover {
-    color: $color-pink;
+    color: #ff00cc;
   }
 }
 
 .btn__back {
-  background-color: $color-light-pink;
+  background-color: #fff1f5;
   padding: 0.5rem 1rem;
   border-radius: 5px;
   border: none;
   cursor: pointer;
-  transition: $transition-all;
+  transition: all 0.3s ease;
   position: relative;
   z-index: 1;
   margin-top: 1.5rem;
-  font-family: $font-header-family;
+  font-family: 'Roboto', sans-serif;
   font-weight: 500;
-  color: $color-pink;
-  @include pulse-animation;
+  color: #ff00cc;
+  animation: pulse 1s infinite;
 
   &:hover {
     text-shadow: none;
@@ -87,5 +87,17 @@
 body[data-theme='dark'] {
   .container {
     background: linear-gradient(135deg, #e7e7ef, #28285f);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 5px #ff00cc;
+  }
+  50% {
+    box-shadow: 0 0 20px #ff00cc;
+  }
+  100% {
+    box-shadow: 0 0 5px #ff00cc;
   }
 }

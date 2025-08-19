@@ -1,11 +1,8 @@
-'use client';
-
-import { useRouter } from 'next/navigation';
-import { useSearchParams } from 'next/navigation';
+import React, { Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Spinner from '../Spinner/Spinner';
 import s from './ItemDetail.module.scss';
-
 import type { BreedResponse } from '../../../api/catApi';
 import { fetchBreedAndImageUrl } from '../../../api/catApi';
 
@@ -68,4 +65,10 @@ const ItemDetail = () => {
   );
 };
 
-export default ItemDetail;
+export default function ItemDetailWrapper() {
+  return (
+    <Suspense fallback={<div>Loading Item Detail...</div>}>
+      <ItemDetail />
+    </Suspense>
+  );
+}

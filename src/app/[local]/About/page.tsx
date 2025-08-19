@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import authorPhoto from '../../assets/author.jpeg';
+import authorPhoto from '../../../assets/author.jpeg';
 import s from './About.module.scss';
 
 export default function AboutPage() {
