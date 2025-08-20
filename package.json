@@ -6,15 +6,16 @@
   "homepage": "https://elena-web.github.io/rs-react-app",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "preview": "vite preview",
     "prepare": "husky install",
     "format:fix": "prettier --write .",
     "test:lint": "eslint .",
+    "build": "next build",
+    "export": "next export",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist",
+    "deploy": "gh-pages -d out",
     "test": "jest",
     "test:coverage": "jest --coverage"
   },

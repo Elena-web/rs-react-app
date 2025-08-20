@@ -1,5 +1,3 @@
-'use client';
-
 import Image from 'next/image';
 import Link from 'next/link';
 import authorPhoto from '../../../assets/author.jpeg';
@@ -41,4 +39,11 @@ export default function AboutPage() {
       </div>
     </div>
   );
+}
+
+export async function generateStaticParams() {
+  return [
+    { local: 'en' },
+    { local: 'ru' },
+  ];
 }

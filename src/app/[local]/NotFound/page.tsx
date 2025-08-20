@@ -13,3 +13,10 @@ const NotFoundPage = () => {
 };
 
 export default NotFoundPage;
+
+export async function generateStaticParams() {
+  return [
+    { local: 'en' },
+    { local: 'ru' },
+  ];
+}
