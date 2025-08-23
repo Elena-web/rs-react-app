@@ -1,7 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import authorPhoto from '../../../assets/author.jpeg';
 import s from './About.module.scss';
 
 export default function AboutPage() {
@@ -13,7 +12,7 @@ export default function AboutPage() {
         <div className={s.content}>
           <div className={s.img}>
             <Image
-              src={authorPhoto}
+              src="/author.jpeg"
               alt="Elena Pavlovich"
               width={150}
               height={150}

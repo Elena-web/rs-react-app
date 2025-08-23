@@ -3,7 +3,6 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import pawIcon from '../../../assets/icon-paw.png';
 import Image from 'next/image';
 import { useTheme } from '../../../context/ThemeContext';
 import s from './Navigation.module.scss';
@@ -20,7 +19,7 @@ const Navigation = () => {
           style={{ position: 'relative', width: '32px', height: '32px' }}
         >
           <Image
-            src={pawIcon}
+            src='/icon-paw.png'
             alt="Cats"
             fill
             style={{ objectFit: 'contain' }}
