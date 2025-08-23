@@ -8,6 +8,9 @@ const config: Config = {
       babelConfig: false,
     },
   },
+  transform: {
+  '^.+\\.(js|jsx|ts|tsx)$': '@swc/jest',
+},
   testEnvironment: 'jsdom',
   testMatch: ['**/*.test.ts', '**/*.test.tsx'],
   moduleNameMapper: {
