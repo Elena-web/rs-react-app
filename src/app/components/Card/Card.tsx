@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import Link from 'next/link';
 import s from './Card.module.scss';
 
@@ -26,7 +27,7 @@ const Card: React.FC<CardProps> = ({
   };
 
   return (
-    <div className={s.cardWrapper}>
+    <div className={s.cardWrapper} data-testid="card">
       <Link href={`/details/${id}`} className={s.card}>
         <div className={s.checkboxWrapper}>
           <input

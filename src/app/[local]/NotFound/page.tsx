@@ -1,3 +1,4 @@
+import React from 'react';
 import s from './NotFound.module.scss';
 const NotFoundPage = () => {
   return (

@@ -1,10 +1,27 @@
+import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import ItemDetail from './ItemDetail';
-import * as catApi from '../../api/catApi';
+import * as catApi from '../../../api/catApi';
 import '@testing-library/jest-dom';
 
-jest.mock('../../api/catApi');
+jest.mock('../../../api/catApi');
+
+const mockPush = jest.fn();
+const mockReplace = jest.fn();
+
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: mockPush,
+    replace: mockReplace,
+    prefetch: jest.fn(),
+  }),
+  useSearchParams: () => ({
+    get: (key: string) => {
+      if (key === 'id') return 'abc';
+      return null;
+    },
+  }),
+}));
 
 const mockBreed = {
   id: 'abc',
@@ -25,13 +42,7 @@ describe('ItemDetail', () => {
       imageUrl: mockImageUrl,
     });
 
-    render(
-      <MemoryRouter initialEntries={['/details/abc']}>
-        <Routes>
-          <Route path="/details/:id" element={<ItemDetail />} />
-        </Routes>
-      </MemoryRouter>
-    );
+    render(<ItemDetail />);
 
     expect(screen.getByText(/Loading.../i)).toBeInTheDocument();
 
@@ -39,25 +50,14 @@ describe('ItemDetail', () => {
       expect(screen.getByText(mockBreed.name)).toBeInTheDocument();
     });
 
-    expect(screen.getByAltText(mockBreed.name)).toHaveAttribute(
-      'src',
-      mockImageUrl
-    );
+    expect(screen.getByAltText(mockBreed.name)).toHaveAttribute('src', mockImageUrl);
     expect(screen.getByText(mockBreed.description)).toBeInTheDocument();
   });
 
   it('shows error if API call fails', async () => {
-    (catApi.fetchBreedAndImageUrl as jest.Mock).mockRejectedValue(
-      new Error('API failed')
-    );
+    (catApi.fetchBreedAndImageUrl as jest.Mock).mockRejectedValue(new Error('API failed'));
 
-    render(
-      <MemoryRouter initialEntries={['/details/abc']}>
-        <Routes>
-          <Route path="/details/:id" element={<ItemDetail />} />
-        </Routes>
-      </MemoryRouter>
-    );
+    render(<ItemDetail />);
 
     expect(screen.getByText(/Loading.../i)).toBeInTheDocument();
 
@@ -67,13 +67,11 @@ describe('ItemDetail', () => {
   });
 
   it('shows "Invalid ID" if id param is missing', async () => {
-    render(
-      <MemoryRouter initialEntries={['/details']}>
-        <Routes>
-          <Route path="/details" element={<ItemDetail />} />
-        </Routes>
-      </MemoryRouter>
-    );
+    (jest.requireMock('next/navigation') as any).useSearchParams = () => ({
+      get: () => null,
+    });
+
+    render(<ItemDetail />);
 
     await waitFor(() => {
       expect(screen.getByRole('alert')).toHaveTextContent('Error: Invalid ID');

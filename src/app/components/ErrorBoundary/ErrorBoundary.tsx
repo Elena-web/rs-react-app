@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { Component, ReactNode } from 'react';
 import s from './ErrorBoundary.module.scss';
 interface ErrorBoundaryProps {

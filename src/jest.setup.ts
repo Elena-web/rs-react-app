@@ -1,3 +1,6 @@
+import React from 'react';
+global.React = React;
+
 import '@testing-library/jest-dom';
 import 'whatwg-fetch';
 import { TextEncoder, TextDecoder as NodeTextDecoder } from 'util';

@@ -1,3 +1,4 @@
+import React from 'react';
 import s from './CardSkeleton.module.scss';
 
 const CardSkeleton = () => (

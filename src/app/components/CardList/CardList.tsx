@@ -1,3 +1,4 @@
+import React from 'react';
 import Card from '../Card/Card';
 import CardListSkeleton from '../CardListSkeleton/CardListSkeleton';
 import s from './CardList.module.scss';
