@@ -19,7 +19,7 @@ const Navigation = () => {
           style={{ position: 'relative', width: '32px', height: '32px' }}
         >
           <Image
-            src='/icon-paw.png'
+            src="/icon-paw.png"
             alt="Cats"
             fill
             style={{ objectFit: 'contain' }}

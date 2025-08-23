@@ -44,5 +44,5 @@ describe('Search component', () => {
     const stored = localStorage.getItem('searchTerm');
     expect(stored).not.toBeNull();
     expect(stored).toBe('Maine Coon');
-});
+  });
 });

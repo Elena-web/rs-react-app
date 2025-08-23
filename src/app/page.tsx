@@ -5,10 +5,10 @@ import MainBlockWrapper from './components/MainBlockWrapper/MainBlockWrapper';
 
 export default function HomePage() {
   return (
-	<Suspense fallback={<div>Loading...</div>}>
-    <ErrorBoundary>
-      <MainBlockWrapper />
-    </ErrorBoundary>
-	</Suspense>
+    <Suspense fallback={<div>Loading...</div>}>
+      <ErrorBoundary>
+        <MainBlockWrapper />
+      </ErrorBoundary>
+    </Suspense>
   );
 }

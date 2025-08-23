@@ -16,8 +16,12 @@ describe('Header Component', () => {
     const mockOnSearch = jest.fn();
     render(<Header onSearch={mockOnSearch} defaultValue="" />);
 
-    expect(screen.getByText(/Discover Your Perfect Breed/i)).toBeInTheDocument();
-    expect(screen.getByText(/Use the field below to find the cat breed/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Discover Your Perfect Breed/i)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Use the field below to find the cat breed/i)
+    ).toBeInTheDocument();
     expect(screen.getByText(/Maine, Bengal, Sphynx/i)).toBeInTheDocument();
     expect(screen.getByText(/Mock Search/)).toBeInTheDocument();
   });

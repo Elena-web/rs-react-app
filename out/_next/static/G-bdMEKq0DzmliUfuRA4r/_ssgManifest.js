@@ -1,1 +1,5 @@
-self.__SSG_MANIFEST=new Set(["\u002F[local]\u002FAbout","\u002F[local]\u002FNotFound"]);self.__SSG_MANIFEST_CB&&self.__SSG_MANIFEST_CB()
+self.__SSG_MANIFEST = new Set([
+  '\u002F[local]\u002FAbout',
+  '\u002F[local]\u002FNotFound',
+]);
+self.__SSG_MANIFEST_CB && self.__SSG_MANIFEST_CB();

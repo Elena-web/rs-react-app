@@ -5,11 +5,10 @@ import '@testing-library/jest-dom';
 import 'whatwg-fetch';
 import { TextEncoder, TextDecoder as NodeTextDecoder } from 'util';
 
-
-if (!global.TextEncoder) {
-  (global as any).TextEncoder = TextEncoder;
+if (typeof global.TextEncoder === 'undefined') {
+  Object.assign(global, { TextEncoder });
 }
 
-if (!global.TextDecoder) {
-  (global as any).TextDecoder = NodeTextDecoder;
+if (typeof global.TextDecoder === 'undefined') {
+  Object.assign(global, { TextDecoder: NodeTextDecoder });
 }

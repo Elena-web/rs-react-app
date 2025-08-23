@@ -143,42 +143,42 @@ describe('catApi functions', () => {
   });
 
   describe('fetchTotalImageCount', () => {
-  it('returns correct count of images', async () => {
-    const mockImages: MockImage[] = new Array(50).fill({
-      id: 'img',
-      url: 'url',
-      breeds: [],
+    it('returns correct count of images', async () => {
+      const mockImages: MockImage[] = new Array(50).fill({
+        id: 'img',
+        url: 'url',
+        breeds: [],
+      });
+
+      fetchMock.mockResponseOnce(JSON.stringify(mockImages), {
+        headers: { 'pagination-count': '50' },
+      });
+
+      const count = await fetchTotalImageCount(['abc', 'def']);
+
+      expect(fetchMock).toHaveBeenCalledWith(
+        expect.stringContaining('limit=1&page=0&breed_ids=abc,def'),
+        expect.any(Object)
+      );
+      expect(count).toBe(1);
     });
 
-    fetchMock.mockResponseOnce(JSON.stringify(mockImages), {
-      headers: { 'pagination-count': '50' },
+    it('returns array length when no pagination header', async () => {
+      const mockImages: MockImage[] = [{} as MockImage];
+
+      fetchMock.mockResponseOnce(JSON.stringify(mockImages));
+
+      const count = await fetchTotalImageCount([]);
+
+      expect(count).toBe(1);
     });
 
-    const count = await fetchTotalImageCount(['abc', 'def']);
+    it('throws error on fetch failure', async () => {
+      fetchMock.mockResponseOnce('', { status: 500 });
 
-    expect(fetchMock).toHaveBeenCalledWith(
-      expect.stringContaining('limit=1&page=0&breed_ids=abc,def'),
-      expect.any(Object)
-    );
-    expect(count).toBe(1);
+      await expect(fetchTotalImageCount([])).rejects.toThrow(
+        'Failed to fetch image count'
+      );
+    });
   });
-
-  it('returns array length when no pagination header', async () => {
-    const mockImages: MockImage[] = [{} as MockImage];
-
-    fetchMock.mockResponseOnce(JSON.stringify(mockImages));
-
-    const count = await fetchTotalImageCount([]);
-
-    expect(count).toBe(1);
-  });
-
-  it('throws error on fetch failure', async () => {
-    fetchMock.mockResponseOnce('', { status: 500 });
-
-    await expect(fetchTotalImageCount([])).rejects.toThrow(
-      'Failed to fetch image count'
-    );
-  });
-});
 });

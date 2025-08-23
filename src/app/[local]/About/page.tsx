@@ -42,8 +42,5 @@ export default function AboutPage() {
 }
 
 export async function generateStaticParams() {
-  return [
-    { local: 'en' },
-    { local: 'ru' },
-  ];
+  return [{ local: 'en' }, { local: 'ru' }];
 }

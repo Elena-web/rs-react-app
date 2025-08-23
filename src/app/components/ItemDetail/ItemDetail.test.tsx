@@ -15,13 +15,18 @@ jest.mock('next/navigation', () => ({
     replace: mockReplace,
     prefetch: jest.fn(),
   }),
-  useSearchParams: () => ({
+  useSearchParams: jest.fn(() => ({
     get: (key: string) => {
       if (key === 'id') return 'abc';
       return null;
     },
-  }),
+  })),
 }));
+
+const mockedCatApi = jest.mocked(catApi);
+const mockedNavigation = jest.mocked(jest.requireMock('next/navigation'), {
+  shallow: false,
+});
 
 const mockBreed = {
   id: 'abc',
@@ -37,7 +42,7 @@ describe('ItemDetail', () => {
   });
 
   it('renders breed details successfully', async () => {
-    (catApi.fetchBreedAndImageUrl as jest.Mock).mockResolvedValue({
+    mockedCatApi.fetchBreedAndImageUrl.mockResolvedValue({
       breed: mockBreed,
       imageUrl: mockImageUrl,
     });
@@ -50,12 +55,17 @@ describe('ItemDetail', () => {
       expect(screen.getByText(mockBreed.name)).toBeInTheDocument();
     });
 
-    expect(screen.getByAltText(mockBreed.name)).toHaveAttribute('src', mockImageUrl);
+    expect(screen.getByAltText(mockBreed.name)).toHaveAttribute(
+      'src',
+      mockImageUrl
+    );
     expect(screen.getByText(mockBreed.description)).toBeInTheDocument();
   });
 
   it('shows error if API call fails', async () => {
-    (catApi.fetchBreedAndImageUrl as jest.Mock).mockRejectedValue(new Error('API failed'));
+    mockedCatApi.fetchBreedAndImageUrl.mockRejectedValue(
+      new Error('API failed')
+    );
 
     render(<ItemDetail />);
 
@@ -67,7 +77,7 @@ describe('ItemDetail', () => {
   });
 
   it('shows "Invalid ID" if id param is missing', async () => {
-    (jest.requireMock('next/navigation') as any).useSearchParams = () => ({
+    mockedNavigation.useSearchParams.mockReturnValue({
       get: () => null,
     });
 

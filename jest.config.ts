@@ -9,8 +9,8 @@ const config: Config = {
     },
   },
   transform: {
-  '^.+\\.(js|jsx|ts|tsx)$': '@swc/jest',
-},
+    '^.+\\.(js|jsx|ts|tsx)$': '@swc/jest',
+  },
   testEnvironment: 'jsdom',
   testMatch: ['**/*.test.ts', '**/*.test.tsx'],
   moduleNameMapper: {
