@@ -1,0 +1,50 @@
+.header {
+  background: linear-gradient(135deg, #8585c7, #28285f);
+  padding: 2rem 2.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: center;
+  font-family: 'Roboto', sans-serif;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  position: relative;
+  z-index: 1;
+  box-shadow:
+    0 8px 25px rgba(255, 0, 204, 0.25),
+    0 0 15px rgba(0, 255, 255, 0.1);
+}
+
+.title {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  color: #ff00cc;
+  text-shadow:
+    0 0 5px #ff00cc,
+    0 0 10px #ff00cc,
+    0 0 20px #ff00cc;
+  font-weight: 700;
+  animation: glowTitle 2s ease-in-out infinite alternate;
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  color: transparent;
+  background: linear-gradient(90deg, #00ffff, #ff00cc);
+  background-clip: text;
+  -webkit-background-clip: text;
+  margin-bottom: 1.5rem;
+  opacity: 0.9;
+}
+
+@keyframes glowTitle {
+  0% {
+    text-shadow: 0 0 5px #ff00cc;
+  }
+  100% {
+    text-shadow: 0 0 25px #ff00cc;
+  }
+}
+
+body[data-theme='dark'] {
+  .header {
+    background: linear-gradient(135deg, #1a1a2e, #28285f);
+  }
+}

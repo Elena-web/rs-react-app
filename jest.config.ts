@@ -2,6 +2,15 @@ import type { Config } from 'jest';
 
 const config: Config = {
   preset: 'ts-jest',
+  globals: {
+    'ts-jest': {
+      tsconfig: 'tsconfig.json',
+      babelConfig: false,
+    },
+  },
+  transform: {
+    '^.+\\.(js|jsx|ts|tsx)$': '@swc/jest',
+  },
   testEnvironment: 'jsdom',
   testMatch: ['**/*.test.ts', '**/*.test.tsx'],
   moduleNameMapper: {

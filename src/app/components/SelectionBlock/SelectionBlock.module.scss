@@ -1,0 +1,51 @@
+.selectionBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #ffe3ec;
+  color: #28285f;
+  font-family: 'Roboto', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  padding: 16px;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  z-index: 100;
+}
+
+.selectionBar button {
+  background-color: #fff1f5;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 1;
+  margin-top: 1.5rem;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 500;
+  color: #ff00cc;
+  margin-left: 10px;
+  animation: pulse 1s infinite;
+
+  &:hover {
+    text-shadow: none;
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 5px #ff00cc;
+  }
+  50% {
+    box-shadow: 0 0 20px #ff00cc;
+  }
+  100% {
+    box-shadow: 0 0 5px #ff00cc;
+  }
+}

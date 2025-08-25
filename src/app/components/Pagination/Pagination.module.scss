@@ -1,0 +1,45 @@
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 600;
+  margin-top: 2rem;
+}
+
+.button {
+  background-color: #ffe3ec;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 1;
+  font-size: 1.2rem;
+  color: #ff00cc;
+  animation: pulse 1s infinite;
+
+  &:hover {
+    color: #28285f;
+    text-shadow: none;
+  }
+}
+
+.page {
+  font-size: 16px;
+  color: #ffe3ec;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 5px #ff00cc;
+  }
+  50% {
+    box-shadow: 0 0 20px #ff00cc;
+  }
+  100% {
+    box-shadow: 0 0 5px #ff00cc;
+  }
+}

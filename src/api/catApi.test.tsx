@@ -11,7 +11,7 @@ import {
 import type {
   MockImage,
   MockBreed,
-} from '../components/MainBlock/__mocks__/mocks';
+} from '../app/components/MainBlock/__mocks__/mocks';
 
 beforeEach(() => {
   fetchMock.resetMocks();
@@ -157,19 +157,20 @@ describe('catApi functions', () => {
       const count = await fetchTotalImageCount(['abc', 'def']);
 
       expect(fetchMock).toHaveBeenCalledWith(
-        expect.stringContaining('limit=1000&page=0&breed_ids=abc,def'),
+        expect.stringContaining('limit=1&page=0&breed_ids=abc,def'),
         expect.any(Object)
       );
-      expect(count).toBe(50);
+      expect(count).toBe(1);
     });
 
-    it('returns zero when no images', async () => {
-      const mockImages: MockImage[] = [];
+    it('returns array length when no pagination header', async () => {
+      const mockImages: MockImage[] = [{} as MockImage];
+
       fetchMock.mockResponseOnce(JSON.stringify(mockImages));
 
       const count = await fetchTotalImageCount([]);
 
-      expect(count).toBe(0);
+      expect(count).toBe(1);
     });
 
     it('throws error on fetch failure', async () => {

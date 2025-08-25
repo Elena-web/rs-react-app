@@ -1,0 +1,44 @@
+.errorBoundary {
+  padding: 2rem;
+  background-color: #ffebee;
+  border: 2px solid #ef5350;
+  border-radius: 8px;
+  color: #c62828;
+  max-width: 600px;
+  margin: 2rem auto;
+  text-align: center;
+}
+
+.errorBoundary h2 {
+  margin-top: 0;
+  font-size: 1.5rem;
+  color: #b71c1c;
+}
+
+.errorBoundary details {
+  text-align: left;
+  margin: 1rem auto;
+  max-width: 90%;
+  white-space: pre-wrap;
+  color: #e53935;
+  background-color: #ffcdd2;
+  padding: 1rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.reloadButton {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  background-color: #ef5350;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #e53935;
+  }
+}
